@@ -2,3 +2,4 @@
 .coverage_data/*
 node_modules/*
 .coverignore
+npm-debug.log

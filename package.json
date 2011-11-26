@@ -13,7 +13,7 @@
         "commander": "0.4.x",
         "cli-table": "0.0.x",
         "underscore": "1.2.x",
-        "underscore.string": "1.2.x",
+        "underscore.string": "2.0.x",
         "compress-buffer": "0.5.x"
     },
     "scripts" : {
