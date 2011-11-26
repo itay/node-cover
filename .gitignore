@@ -1,0 +1,4 @@
+**/format/html/*
+.coverage_data/*
+node_modules/*
+.coverignore

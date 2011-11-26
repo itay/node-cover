@@ -1,0 +1,554 @@
+#!/usr/bin/env node
+
+// Copyright 2011 Itay Neeman
+//
+// Licensed under the MIT License
+
+// TODO:
+// - Better HTML
+
+(function() {
+    var fs            = require('fs');
+    var path          = require('path');
+    var vm            = require("vm");
+    var crypto        = require('crypto');
+    var Module        = require('module').Module;
+    var Table         = require('cli-table');
+    var _             = require('underscore');
+    var _s            = require('underscore.string');
+    var compression   = require('compress-buffer');
+    var commander     = require('commander');
+    
+    var patch_console = require('../utils/console');
+    var cover         = require("../index.js");
+    
+    // Get a list of the built-in reporters
+    var reporterOptions = "[" + _.keys(cover.reporters).join(",") + "]";
+    
+    /* ====== Utilities ====== */
+    
+    // Delete a directory recursively
+    var rmdirRecursiveSync = function(dirPath) {
+        var files = fs.readdirSync(dirPath);
+        
+        for(var i = 0; i < files.length; i++) {
+            var filePath = path.join(dirPath, files[i]);
+            var file = fs.statSync(filePath);
+
+            if (file.isDirectory()) {
+                rmdirRecursiveSync(filePath);
+            }
+            else {
+                fs.unlinkSync(filePath);
+            }
+        }
+
+        fs.rmdirSync(dirPath);
+    };
+    
+    /* ====== Config/Ignore File Handling ====== */
+    
+    // Default config
+    var defaultConfigPath = path.join(path.resolve(__dirname), ".coverrc");
+    var defaultConfig = {};
+    
+    var removeJSONComments = function(str) {
+        str = str || '';
+        str = str.replace(/\/\*[\s\S]*(?:\*\/)/g, ''); //everything between "/* */"
+        str = str.replace(/\/\/[^\n\r]*/g, ''); //everything after "//"
+        return str;
+    };
+    
+    var readIgnoreFile = function(ignorePath) {
+        var ignore = {}
+        
+        // Get the full path relative to the CWD
+        var fullIgnorePath = path.resolve(process.cwd(), ignorePath);
+        if (path.existsSync(fullIgnorePath)) {
+            // If we found an ignore file, read it in
+            var ignoreContents = fs.readFileSync(fullIgnorePath, "utf-8");
+            try {
+                // Note that directory fo the ignore path
+                var dir = path.dirname(path.resolve(ignorePath));
+                var ignores = ignoreContents.split("\n");
+                
+                // For each line (ignoring blank ones), get the full path,
+                // and add it to our ignore list.
+                for(var i = 0; i < ignores.length; i++) {
+                    if (ignores[i].trim() === "") {
+                        continue;
+                    }
+                    
+                    var filePath = path.resolve(dir, ignores[i].trim());
+                    ignore[path.resolve(dir, filePath)] = true;
+                }
+            }
+            catch (ex) {
+                throw new Error("There was a problem parsing your .coverignore file at: " + ignorePath);
+            }
+        }
+        
+        return ignore;
+    };
+    
+    var readConfigFile = function(configFile) {
+        var config = {}
+        
+        // Get the full path relative to the CWD
+        configFile = path.resolve(process.cwd(), configFile);
+        if (!path.existsSync(configFile)) {
+            configFile = defaultConfigPath;
+        }
+        
+        // Remove any comments from the JSON
+        var configContents = removeJSONComments(fs.readFileSync(path.resolve(configFile), "utf-8"));
+        
+        try {
+            // If there is no content, we'll just add an empty object
+            if (configContents.trim() === "") {
+                configContents = "{}";
+            }
+            
+            // Parse it and copy in the defaults
+            var rawConfig = JSON.parse(configContents);
+            for(var key in defaultConfig) {
+                config[key] = defaultConfig[key];
+            }
+            
+            // Override the defaults with specific ones.
+            for(var key in rawConfig) {
+                config[key] = rawConfig[key];
+            }
+        }
+        catch (ex) {
+            throw new Error("There was a problem parsing your .coverrc file at: " + configFile);
+        }
+        
+        return config;
+    };
+    
+    var getOptionsAndIgnore = function(cmdline) {
+        // Get configuration
+        var config = {};
+        if (cmdline.config || ".coverrc") {
+            config = readConfigFile(cmdline.config || ".coverrc");
+        }
+        
+        // Get ignore
+        var ignore = {};
+        if (cmdline.ignore || config.ignore || ".coverignore") {
+            ignore = readIgnoreFile(cmdline.ignore || config.ignore || ".coverignore");
+        }
+        
+        return {
+            config: config,
+            ignore: ignore
+        }
+    };
+    
+    defaultConfig = readConfigFile(defaultConfigPath);
+    
+    /* ====== Context and Execution Handling ====== */
+    
+    var createContext = function(file, options, ignore) {
+        file = fs.realpathSync(file);
+        
+        // Create our context
+        var context = {};
+        
+        // Shallow copy the 'process' variable
+        // and set argv appropriately, on both the
+        // local and "sandbox" version of process.
+        // This is to make sure that when we clone
+        // process (which we do from our local
+        // copy), we clone the right argv.
+        var newProcess = {};
+        for(var k in process) {
+            if (k !== "stdin") {
+                newProcess[k] = process[k];
+            } 
+            else {
+                newProcess.__defineGetter__('stdin', function() {
+                    throw new Error("Cannot use stdin while in coverage mode!");
+                });
+            }
+        }  
+        newProcess.argv = process.argv = ["node", file].concat(options);
+        newProcess.reallyExit = function() {
+            console.error("GO");
+        };
+        process.env._ = "";
+        
+        // Copy over all the globals
+        for(var k in global) {
+            context[k] = global[k];
+        }
+                
+        // Copy over the 'module' variable
+        // and set the filename appropriately,
+        // so that require works properly.
+        var newModule = {};
+        for(var k in module) {
+            newModule[k] = module[k];
+        }
+        newModule.parent = module;
+        
+        // We have to set it on the current module,
+        // because that is what require is going to work
+        // with the current module, not the child
+        // module
+        newModule.filename = file;
+        newModule.paths = [];
+        var dir = file;
+        do {
+            dir = path.dirname(dir);
+            newModule.paths.push(path.join(dir, "node_modules"));
+        } while (dir !== path.dirname(dir));
+        
+        // Copy over the require module
+        // and set up require.module
+        // to point to the right thing
+        var newRequire = function(path) {
+            return Module._load(path, newModule);
+        };
+        newRequire.resolve = function(request) {
+          return Module._resolveFilename(request, newModule)[1];
+        }
+        newRequire.main = newModule;
+        
+        // Set everything into the context
+        context.require = newRequire;
+        context.__filename = file;
+        context.__dirname = path.dirname(file);
+        context.process = newProcess;
+        context.console = console;
+        context.module = newModule;
+        context.exports = {};
+        context.global = context;
+        
+        // We add some unique things to get the coverage hook to work
+        context.__u_ignore = ignore;
+        
+        return context;
+    };
+    
+    // Run a file with coverage enabled in a new context
+    var runFile = function(file, options, ignore) {
+        options = options || [];
+        var optionString = "";
+        for(var i = 0; i < options.length; i++) {
+            optionString += (options[i] + " ");
+        }
+        
+        var file = path.resolve(file);
+        var context = createContext(file, options, ignore);
+        
+        var code = fs.readFileSync(file, "utf-8");
+        
+        // Replace the #!/ in the beginning of executables, because runInNewContext
+        // really doesn't like it.
+        code = code.substr(0, "#!/".length) === "#!/" ? code.replace("#!/", "//#!/") : code;
+        
+        var pathToCover = path.resolve(path.resolve(__dirname), "..", "index.js");
+        
+        var template = _.template(
+            "var cover = require('<%= cover %>'); var coverage = cover.cover(null, __u_ignore);\n" + 
+            "(function() {\n" +
+            "process.nextTick(function() { try { <%=code%>\n } catch(ex) { /* DO NOTHING */ } });" + 
+            "})();\n" + 
+            "coverage;"
+        );
+        var codeToRun = template({
+            cover: pathToCover,
+            code: code
+        });
+        process.on('uncaughtException', function() { /* DO NOTHING */ })
+        try {
+            var coverage = vm.runInNewContext(codeToRun, context, file);
+        }
+        catch(ex) {
+            // Do nothing
+        }
+        
+        return coverage;
+    };
+    
+    /* ====== Save/Load Coverage Data ====== */
+    
+    var saveCoverageData = function(coverageData, configs) {
+        // Setup the information we're going to save
+        var files = {};
+        var toSave = {
+            version: "0.0.1",
+            files: files
+        };
+        
+        _.each(coverageData, function(fileData, fileName, lst) { 
+            
+            // For each file, we hash the source to get a "version ID" 
+            // for it
+            var stats = fileData.stats();
+            var fileSource = stats.source;
+            var md5 = crypto.createHash('md5');
+            md5.update(fileSource);
+            var hash = md5.digest('hex');
+            
+            // We also save the stats and the hash,
+            // which is everything we need in order
+            // to be able to generate reports
+            files[fileName] = {
+                stats: stats,
+                hash: hash
+            }
+        });
+        
+        // Turn it into JSON, compress it, and write it out
+        var data = JSON.stringify(toSave);
+        
+        // Get the ID for this data (md5 hash)
+        var dataMd5 = crypto.createHash('md5');
+        dataMd5.update(data);
+        var dataHash = dataMd5.digest('hex');
+        
+        // Compress the data
+        var compressedData = compression.compress(new Buffer(data, "utf-8"));
+        
+        // Make the directory
+        var dataDirectory = configs.dataDirectory;
+        if (!path.existsSync(dataDirectory)) {
+            fs.mkdirSync(dataDirectory, "0755");
+        }
+        
+        // Write out the file
+        var dataFilename = path.join(dataDirectory, configs.prefix + dataHash);
+        fs.writeFileSync(dataFilename, compressedData);
+    };
+    
+    var loadCoverageData = function(filename, configs) {
+        var dataDirectory = configs.dataDirectory;
+        var dataPrefix = configs.prefix;
+        
+        if (!filename) {
+            // If we weren't given a file, try and read it from the data directory.
+            var filesInDataDirectory = fs.readdirSync(dataDirectory);
+            var matchingFiles = _.filter(filesInDataDirectory, function(file) { return _s.startsWith(file, dataPrefix); });
+            if (matchingFiles.length > 1) {
+                // If there is more than one file, we'll use the last modified one.
+                var latestTime = 0;
+                for(var i = 0; i < matchingFiles.length; i++) {
+                    var fileLatest = fs.statSync(path.join(dataDirectory, matchingFiles[i])).mtime;
+                    if (fileLatest > latestTime) {
+                        latestTime = fileLatest;
+                        filename = matchingFiles[i];
+                    }
+                }
+            }
+            else if (matchingFiles.length === 1) {
+                // If there was exactly one file, we'll use that one
+                filename = matchingFiles[0];
+            }
+            else if (matchingFiles.length === 0) {
+                // If there was no file, error.
+                console.error("Could not find a coverage data file. Please specify one.");   
+                process.exit(1);
+            }
+            
+            // Note the full path to the file
+            filename = path.join(dataDirectory, filename);
+        }
+        
+        // If it doesn't exist, then error out
+        if (!path.existsSync(filename)) {
+            console.error("Coverage data file does not exist: " + filename);   
+            process.exit(1);
+        }
+        
+        // Read the file, and decompress it
+        var compressedData = fs.readFileSync(filename);
+        var data = compression.uncompress(new Buffer(compressedData, "utf-8"));
+        var coverageData = JSON.parse(data);
+        
+        // Remake the objects into what the reporters expect
+        _.each(coverageData.files, function(fileData, fileName) {
+            var stats = fileData.stats;
+            fileData.filename = fileName;
+            fileData.stats = function() { return stats; }; 
+            fileData.source = stats.source;
+        });
+        
+        return coverageData;
+    };
+    
+    /* ====== Reporters ====== */
+    
+    var reporterHandlers = {
+        html: function(coverageData, config) {
+            var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+            var htmlDirectory = config.html.directory;
+            var htmls = {};
+            for(var i = 0; i < files.length; i++) {
+                var filename = files[i];
+                htmls[filename] = cover.reporters.html.format(coverageData[filename]);
+            }
+            
+            if (path.existsSync(htmlDirectory)) {
+               rmdirRecursiveSync(htmlDirectory);
+            }
+            
+            fs.mkdirSync(htmlDirectory, "755");
+            
+            _.each(htmls, function(html, filename) {
+                var outputPath = path.join(htmlDirectory, filename.replace(/\//g, "_") + ".html");
+                
+                html = "" + 
+                    "<style>" + "\n" + 
+                    "  .covered { background: #C9F76F; }" + "\n" + 
+                    "  .uncovered { background: #FDD; }" + "\n" + 
+                    "  .partialuncovered { background: #FFA; }" + "\n" + 
+                    "</style>" + "\n" + 
+                    html;
+                    
+                fs.writeFileSync(outputPath, html);
+            });
+
+            var indexHtml = "<ul>";
+            for(var i = 0; i < files.length; i++) {
+                var file = files[i];
+                indexHtml += ("  <li>" + "<a href='" + file.replace(/\//g, "_") + ".html" + "'>" + file + "</a></li>\n");
+            }
+            indexHtml += "</ul>";
+            
+            fs.writeFileSync(path.join(htmlDirectory, "index.html"), indexHtml);
+        },
+        
+        cli: function(coverageData, config) {
+            var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+            
+            var table = new Table({
+                head: ["Filename", "% Covered", "Missed Lines", "# Lines", "% Blocks", "Missed Blocks", "# Blocks"],
+                style : {
+                    'padding-left' : 1, 
+                    'padding-right ': 1,
+                    head: ['cyan']
+                },
+                colWidths: [cover.reporters.cli.MAX_FILENAME_LENGTH + 5, 10, 14, 10, 10, 14, 10]
+            });
+            
+            for(var i = 0; i < files.length; i++) {
+                var filename = files[i];
+                cover.reporters.cli.format(coverageData[filename], table);
+            }
+            
+            console.log(table.toString());
+        },
+        
+        plain: function(coverageData, config) {
+            var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+                
+            for(var i = 0; i < files.length; i++) {
+                var filename = files[i];
+                console.log(cover.reporters.plain.format(coverageData[filename]));
+            }
+        },
+        
+        json: function(coverageData, config) {
+            var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+                
+            var jsons = [];        
+            for(var i = 0; i < files.length; i++) {
+                var filename = files[i];
+                jsons.push(cover.reporters.json.format(coverageData[filename]));
+            }
+            
+            console.log(JSON.stringify(jsons));
+        },
+        
+        __catch_all: function(coverageData, config, reporter) {
+            
+        }
+    };
+    
+    /* ====== Commands ====== */
+    
+    var run = function(file, cmdline, config, ignore) {     
+        
+        // Run the file
+        var coverage = runFile(file, cmdline, ignore);
+        
+        // Setup the on exit listener
+        process.on(
+            "exit", 
+            function() {
+                // For debugging purposes, make sure we can print things
+                patch_console.patch();
+                coverage(function(coverageData) {
+                    saveCoverageData(coverageData, config);
+                });
+            }
+        );
+    };
+    
+    var report = function(reporterName, file, config, ignore) {
+        var coverageData = loadCoverageData(file, config);
+        
+        reporterName = reporterName || "cli";
+        
+        var reporter = "";
+        if (cover.reporters[reporterName]) {
+            reporter = cover.reporters[reporterName];
+        }
+        else {
+            try {
+                reporter = require(path.resolve(reporterName));
+            }
+            catch(ex) {
+                console.log("Could not find reporter: " + reporterName);
+                process.exit(1);
+            }
+        }
+        
+        (reporterHandlers[reporterName] || reporterHandlers.__catch_all)(coverageData.files, config, reporter);
+    }
+    
+    /* ====== Command Line Parsing ====== */
+    
+    commander
+        .version("0.0.1")
+        .option("-c, --config <config>", "Path to a .coverrc file")
+        .option("-i, --ignore <ignore>", "Path to a .coverignore file")
+        
+    commander.command("run <file>")
+        .description("Run a file and collect code coverage information for it")
+        .action(function(file) {       
+            var configs = getOptionsAndIgnore(this);
+            var config = configs.config;
+            var ignore = configs.ignore;
+        
+            // Remove the command itself
+            var cmdline = this.args.slice(1);
+            
+            run(file, cmdline, config, ignore);
+        });
+        
+    commander.command("report [reporter] [file]")
+        .description("Report on saved coverage data. Specify a coverage file and a reporter: " + reporterOptions)
+        .action(function(reporterName, file) {    
+            var configs = getOptionsAndIgnore(this);
+            var config = configs.config;
+            var ignore = configs.ignore;
+                
+            report(reporterName, file, config, ignore);
+        });
+        
+    /* ====== Exports ====== */
+    
+    module.exports = {
+        parse: function(argv) { return commander.parse(argv); },
+        run: run,
+        report: report
+    };
+})();
+
+if (module === require.main) {
+    module.exports.parse(process.argv);
+}

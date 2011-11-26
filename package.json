@@ -1,0 +1,42 @@
+{
+    "name" : "cover",
+    "version" : "0.0.1",
+    "description" : "Native JavaScript code coverage",
+    "main" : "index.js",
+    "directories" : {
+        "bin": "bin",
+        "lib" : ".",
+        "test" : "test"
+    },
+    "dependencies" : {
+        "bunker" : "0.1.x",
+        "commander": "0.4.x",
+        "cli-table": "0.0.x",
+        "underscore": "1.2.x",
+        "underscore.string": "1.2.x",
+        "compress-buffer": "0.5.x"
+    },
+    "scripts" : {
+        "test" : "node test/index.js"
+    },
+    "repository" : {
+        "type" : "git",
+        "url" : "http://github.com/itay/node-cover.git"
+    },
+    "keywords" : [
+        "code",
+        "coverage",
+        "bunker",
+        "cover",
+        "test"
+    ],
+    "author" : {
+        "name" : "Itay Neeman",
+        "email" : "itay@neeman.net",
+        "url" : "http://www.pretzelwisdom.com"
+    },
+    "license" : "MIT/X11",
+    "engine" : { "node" : ">=0.4" },
+    "private": true,
+    "preferGlobal": "true"
+}
