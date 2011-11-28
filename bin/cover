@@ -385,7 +385,11 @@
             var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
             var allStats = [];
             var statsByFile = {};
+            
             var htmlDirectory = config.html.directory;
+            var templateDir = path.resolve(__dirname, "..", "templates");
+            var resourceDir = path.resolve(__dirname, "..", "resources");
+            
             var htmls = {};
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
@@ -431,7 +435,7 @@
             _.each(htmls, function(html, filename) {
                 var outputPath = path.join(htmlDirectory, filename.replace(/\//g, "_") + ".html");
                 
-                var htmlTemplateString = fs.readFileSync("./templates/file.html").toString("utf-8");
+                var htmlTemplateString = fs.readFileSync(path.join(templateDir, "file.html")).toString("utf-8");
                 var htmlTemplate = _.template(htmlTemplateString); 
                 var html = htmlTemplate({ 
                     filename: filename, 
@@ -443,7 +447,7 @@
             });
 
             // Compile the index file with the template, and write it out to disk
-            var indexTemplateString = fs.readFileSync("./templates/index.html").toString("utf-8");
+            var indexTemplateString = fs.readFileSync(path.join(templateDir, "index.html")).toString("utf-8");
             var indexTemplate = _.template(indexTemplateString);  
             var headers = ["Filename", "% Covered", "Missed Lines", "# Lines", "% Blocks", "Missed Blocks", "# Blocks"];
             var fileUrls = {};
@@ -456,11 +460,11 @@
             fs.writeFileSync(path.join(htmlDirectory, "index.html"), indexHtml);
             
             // Copy over the resource files
-            fs.link(path.join("resources", "bootstrap.css"), path.join(htmlDirectory, "bootstrap.css"));
-            fs.link(path.join("resources", "prettify.css"), path.join(htmlDirectory, "prettify.css"));
-            fs.link(path.join("resources", "prettify.js"), path.join(htmlDirectory, "prettify.js"));
-            fs.link(path.join("resources", "jquery.min.js"), path.join(htmlDirectory, "jquery.min.js"));
-            fs.link(path.join("resources", "jquery.tablesorter.min.js"), path.join(htmlDirectory, "jquery.tablesorter.min.js"));
+            fs.link(path.join(resourceDir, "bootstrap.css"), path.join(htmlDirectory, "bootstrap.css"));
+            fs.link(path.join(resourceDir, "prettify.css"), path.join(htmlDirectory, "prettify.css"));
+            fs.link(path.join(resourceDir, "prettify.js"), path.join(htmlDirectory, "prettify.js"));
+            fs.link(path.join(resourceDir, "jquery.min.js"), path.join(htmlDirectory, "jquery.min.js"));
+            fs.link(path.join(resourceDir, "jquery.tablesorter.min.js"), path.join(htmlDirectory, "jquery.tablesorter.min.js"));
         },
         
         cli: function(coverageData, config) {
