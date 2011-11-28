@@ -5,7 +5,6 @@
 // Licensed under the MIT License
 
 // TODO:
-// - Better HTML
 
 (function() {
     var fs            = require('fs');
@@ -60,7 +59,7 @@
     };
     
     var readIgnoreFile = function(ignorePath) {
-        var ignore = {}
+        var ignore = {};
         
         // Get the full path relative to the CWD
         var fullIgnorePath = path.resolve(process.cwd(), ignorePath);
@@ -380,10 +379,12 @@
     };
     
     /* ====== Reporters ====== */
-    
+        
     var reporterHandlers = {
         html: function(coverageData, config) {
             var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+            var allStats = [];
+            var statsByFile = {};
             var htmlDirectory = config.html.directory;
             var htmls = {};
             for(var i = 0; i < files.length; i++) {
@@ -391,34 +392,75 @@
                 htmls[filename] = cover.reporters.html.format(coverageData[filename]);
             }
             
+            // For each file, we compile a list of its summmary stats
+            for(var i = 0; i < files.length; i++) {
+                var filename = files[i];
+                var stats = coverageData[filename].stats();
+                
+                statsByFile[filename] = {
+                    percentage: Math.floor(stats.percentage * 100) + "%", 
+                    missingLines: stats.missing, 
+                    seenLines: stats.seen,
+                    partialLines: _.values(stats.coverage).filter(function(lineinfo) { return lineinfo.partial; }).length,
+                    totalLines: stats.total,
+                    blockPercentage: Math.floor(stats.blocks.percentage * 100) + "%",
+                    missingBlocks: stats.blocks.missing,
+                    seenBlocks: stats.blocks.seen,
+                    totalBlocks: stats.blocks.total,
+                };
+                
+                allStats.push([
+                    filename, 
+                    Math.floor(stats.percentage * 100) + "%", 
+                    stats.missing, 
+                    stats.total,
+                    Math.floor(stats.blocks.percentage * 100) + "%",
+                    stats.blocks.missing,
+                    stats.blocks.total
+                ]);
+            }
+            
+            // Delete the HTML directory if necessary, and then create it
             if (path.existsSync(htmlDirectory)) {
                rmdirRecursiveSync(htmlDirectory);
             }
-            
             fs.mkdirSync(htmlDirectory, "755");
             
+            // For each HTML file, use the template to generate an HTML file,
+            // and write it out to disk
             _.each(htmls, function(html, filename) {
                 var outputPath = path.join(htmlDirectory, filename.replace(/\//g, "_") + ".html");
                 
-                html = "" + 
-                    "<style>" + "\n" + 
-                    "  .covered { background: #C9F76F; }" + "\n" + 
-                    "  .uncovered { background: #FDD; }" + "\n" + 
-                    "  .partialuncovered { background: #FFA; }" + "\n" + 
-                    "</style>" + "\n" + 
-                    html;
+                var htmlTemplateString = fs.readFileSync("./templates/file.html").toString("utf-8");
+                var htmlTemplate = _.template(htmlTemplateString); 
+                var html = htmlTemplate({ 
+                    filename: filename, 
+                    code: html,
+                    stats: statsByFile[filename]     
+                }); 
                     
                 fs.writeFileSync(outputPath, html);
             });
 
-            var indexHtml = "<ul>";
-            for(var i = 0; i < files.length; i++) {
-                var file = files[i];
-                indexHtml += ("  <li>" + "<a href='" + file.replace(/\//g, "_") + ".html" + "'>" + file + "</a></li>\n");
-            }
-            indexHtml += "</ul>";
+            // Compile the index file with the template, and write it out to disk
+            var indexTemplateString = fs.readFileSync("./templates/index.html").toString("utf-8");
+            var indexTemplate = _.template(indexTemplateString);  
+            var headers = ["Filename", "% Covered", "Missed Lines", "# Lines", "% Blocks", "Missed Blocks", "# Blocks"];
+            var fileUrls = {};
+            _.each(files, function(file) {
+                fileUrls[file] =  file.replace(/\//g, "_") + ".html";
+            });
             
+            var indexHtml = indexTemplate({ headers: headers, data: allStats, fileUrls: fileUrls });
+                
             fs.writeFileSync(path.join(htmlDirectory, "index.html"), indexHtml);
+            
+            // Copy over the resource files
+            fs.link(path.join("resources", "bootstrap.css"), path.join(htmlDirectory, "bootstrap.css"));
+            fs.link(path.join("resources", "prettify.css"), path.join(htmlDirectory, "prettify.css"));
+            fs.link(path.join("resources", "prettify.js"), path.join(htmlDirectory, "prettify.js"));
+            fs.link(path.join("resources", "jquery.min.js"), path.join(htmlDirectory, "jquery.min.js"));
+            fs.link(path.join("resources", "jquery.tablesorter.min.js"), path.join(htmlDirectory, "jquery.tablesorter.min.js"));
         },
         
         cli: function(coverageData, config) {

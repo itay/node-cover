@@ -6,7 +6,6 @@ exports.something = function(a) {
     
     d = 3;
     
-    return [a + 1, a + 2];
   } else {
     b = 1;
     
@@ -16,11 +15,17 @@ exports.something = function(a) {
     
     f = 11; 
     
+    if (1) f = 1; if (0) f = 2;
+    
+    return [a + 1, a + 2];
+    
     return a - 1;
   }
 };
 
 b = function() {
+  if (a < 0) return;
+  
   a = 1;
   b = 2;
   c = 3;  
