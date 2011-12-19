@@ -82,3 +82,7 @@ on the command line:
 
 > cover --config path/to/config --ignore path/to/ignore run myfile.js
 
+[substack]: https://github.com/substack
+[bunker]: https://github.com/substack/node-bunker
+[Chris Dickinson]: https://github.com/chrisdickinson
+[runforcover]: https://github.com/chrisdickinson/node-runforcover
