@@ -1,0 +1,291 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>/Users/itay/Work/mocha/lib/utils.js -- cover.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="prettify.css" type="text/css" rel="stylesheet" />
+    <style type="text/css">
+      html, body {
+        font-family: georgia, serif;
+      }
+      
+      .content {
+      }
+      table#files-table {
+        table-layout: fixed;
+        width: 94%;
+      }
+
+      table#files-table td, table#files-table th {
+        width: 11%;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      
+      table#files-table td:first-child, table#files-table th:first-child {
+        width: 33%;
+      }
+        
+      li.L0,li.L1,li.L2,li.L3,li.L4, li.L5,li.L6,li.L7,li.L8, li.L9 { background: transparent; }
+      li.L1,li.L3,li.L5,li.L7,li.L9 { background: white; }
+       
+      li.covered {
+        border-left: 2px solid lime; 
+      }
+      
+      li.uncovered {
+        background: #FDD;
+        border-left: 2px solid red; 
+      }
+      
+      li.partial {
+        border-left: 2px solid #EE9; 
+        background: #FFA;
+      }
+      
+      .partialuncovered { 
+        background: #EE9; 
+      }
+      
+      ol.linenums { 
+        font-size: 10px;
+      }
+      
+      ol.linenums li  {
+        line-height: 16px;
+      }
+      
+      ol.linenums li span {
+        font-size: 12px;
+      }
+      
+      pre.prettyprint {
+        padding-top: 1em;
+        border: 5px;
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+        font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
+
+      }
+      
+      div.header {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border-bottom: 1px solid #EEE;
+        height: 90px;
+        background: #F8F8F8;
+      }
+      
+      div.header-content {
+        padding: 1em 3em;
+      }
+      
+      a.index {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      a.coverio {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      div.content > a.index {
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+      }
+      
+      div.header-content h3 {
+        font-weight: normal;
+      }
+      
+      span.filename {
+        font-weight: bold;
+      }
+      
+      span.percentage {
+        font-weight: bold;
+      }
+      
+      div.stats {
+        font-size: 13px;
+      }
+      
+      div.stats span.separator {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      
+      div.stats span.stat-descriptor {
+        color: gray;
+      }
+      
+    </style>
+
+    <script src="jquery.min.js"></script>
+    <script type="text/javascript" src="prettify.js"></script>
+    <script >
+      $(function() {
+        prettyPrint();
+        
+        $("li span.covered").parent().addClass("covered");
+        $("li span.uncovered").parent().addClass("uncovered");
+        $("li span.partial").parent().addClass("partial");
+      });
+    </script>
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+
+      <div class="content">
+        <div class="header">
+          <div class="header-content">
+            <a class="index" href="index.html">« index</a>
+            <h3>Coverage for <span class="filename">/Users/itay/Work/mocha/lib/utils.js</span> : <span class="percentage">84%</span></h3>
+            <div class="stats">
+              110  <span class="stat-descriptor">lines</span>     <span class="separator">| </span> 
+              93  <span class="stat-descriptor">run</span>        <span class="separator">| </span> 
+              17  <span class="stat-descriptor">missing</span>    <span class="separator">| </span> 
+              0  <span class="stat-descriptor">partial</span>      <span class="separator">| </span> 
+              20  <span class="stat-descriptor">blocks</span>     <span class="separator">| </span> 
+              1  <span class="stat-descriptor">blocks run</span>  <span class="separator">| </span> 
+              19  <span class="stat-descriptor">blocks missing</span>
+            </div>
+          </div>
+        </div>
+        <pre class='prettyprint lang-js linenums'>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Escape special characters in the given string of html.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param  {String} html</span>
+<span class='covered'>   * @return {String}</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.escape = function(html) {</span>
+<span class='uncovered'>    return String(html)</span>
+<span class='uncovered'>      .replace(/&/g, '&amp;')</span>
+<span class='uncovered'>      .replace(/"/g, '&quot;')</span>
+<span class='uncovered'>      .replace(/&lt;/g, '&lt;')</span>
+<span class='uncovered'>      .replace(/>/g, '&gt;');</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Array#forEach (<=IE8)</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Array} array</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @param {Object} scope</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.forEach = function(arr, fn, scope) {</span>
+<span class='uncovered'>    for (var i = 0, l = arr.length; i &lt; l; i++)</span>
+<span class='uncovered'>      fn.call(scope, arr[i], i);</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Array#indexOf (<=IE8)</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @parma {Array} arr</span>
+<span class='covered'>   * @param {Object} obj to find index of</span>
+<span class='covered'>   * @param {Number} start</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.indexOf = function (arr, obj, start) {</span>
+<span class='uncovered'>    for (var i = start || 0, l = arr.length; i &lt; l; i++) {</span>
+<span class='uncovered'>      if (arr[i] === obj)</span>
+<span class='covered'>        return i;</span>
+<span class='covered'>    }</span>
+<span class='uncovered'>    return -1;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Array#reduce (<=IE8)</span>
+<span class='covered'>   * </span>
+<span class='covered'>   * @param {Array} array</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @param {Object} initial value</span>
+<span class='covered'>   * @param {Object} scope</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.reduce = function(arr, fn, val, scope) {</span>
+<span class='uncovered'>    var rval = val;</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    for (var i = 0, l = arr.length; i &lt; l; i++) {</span>
+<span class='uncovered'>      rval = fn.call(scope, rval, arr[i], i, arr);</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='covered'>    return rval;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Array#filter (<=IE8)</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Array} array</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @param {Object} scope</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.filter = function(arr, fn, scope) {</span>
+<span class='uncovered'>    var ret = [];</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    for (var i = 0, l = arr.length; i &lt; l; i++) {</span>
+<span class='uncovered'>      var val = arr[i];</span>
+<span class='uncovered'>      if (fn.call(scope, val, i, arr))</span>
+<span class='uncovered'>        ret.push(val);</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='covered'>    return ret;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Object.keys (<=IE8)</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Object} obj</span>
+<span class='covered'>   * @return {Array} keys</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.keys = Object.keys || function(obj) {</span>
+<span class='uncovered'>    var keys = []</span>
+<span class='uncovered'>      , has = Object.prototype.hasOwnProperty // for `window` on &lt;=IE8</span>
+<span class='covered'>  </span>
+<span class='covered'>    for (var i in obj) {</span>
+<span class='uncovered'>      if (has.call(obj, i)) {</span>
+<span class='uncovered'>        keys.push(i);</span>
+<span class='covered'>      }</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='covered'>    return keys;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+</pre>
+        <a class="index" href="index.html">« index</a> | <a class="coverio" href="http://cover.io">cover.io</a>
+      </div>
+  </body>
+</html>

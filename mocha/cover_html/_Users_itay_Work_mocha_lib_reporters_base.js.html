@@ -1,0 +1,405 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>/Users/itay/Work/mocha/lib/reporters/base.js -- cover.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="prettify.css" type="text/css" rel="stylesheet" />
+    <style type="text/css">
+      html, body {
+        font-family: georgia, serif;
+      }
+      
+      .content {
+      }
+      table#files-table {
+        table-layout: fixed;
+        width: 94%;
+      }
+
+      table#files-table td, table#files-table th {
+        width: 11%;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      
+      table#files-table td:first-child, table#files-table th:first-child {
+        width: 33%;
+      }
+        
+      li.L0,li.L1,li.L2,li.L3,li.L4, li.L5,li.L6,li.L7,li.L8, li.L9 { background: transparent; }
+      li.L1,li.L3,li.L5,li.L7,li.L9 { background: white; }
+       
+      li.covered {
+        border-left: 2px solid lime; 
+      }
+      
+      li.uncovered {
+        background: #FDD;
+        border-left: 2px solid red; 
+      }
+      
+      li.partial {
+        border-left: 2px solid #EE9; 
+        background: #FFA;
+      }
+      
+      .partialuncovered { 
+        background: #EE9; 
+      }
+      
+      ol.linenums { 
+        font-size: 10px;
+      }
+      
+      ol.linenums li  {
+        line-height: 16px;
+      }
+      
+      ol.linenums li span {
+        font-size: 12px;
+      }
+      
+      pre.prettyprint {
+        padding-top: 1em;
+        border: 5px;
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+        font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
+
+      }
+      
+      div.header {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border-bottom: 1px solid #EEE;
+        height: 90px;
+        background: #F8F8F8;
+      }
+      
+      div.header-content {
+        padding: 1em 3em;
+      }
+      
+      a.index {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      a.coverio {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      div.content > a.index {
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+      }
+      
+      div.header-content h3 {
+        font-weight: normal;
+      }
+      
+      span.filename {
+        font-weight: bold;
+      }
+      
+      span.percentage {
+        font-weight: bold;
+      }
+      
+      div.stats {
+        font-size: 13px;
+      }
+      
+      div.stats span.separator {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      
+      div.stats span.stat-descriptor {
+        color: gray;
+      }
+      
+    </style>
+
+    <script src="jquery.min.js"></script>
+    <script type="text/javascript" src="prettify.js"></script>
+    <script >
+      $(function() {
+        prettyPrint();
+        
+        $("li span.covered").parent().addClass("covered");
+        $("li span.uncovered").parent().addClass("uncovered");
+        $("li span.partial").parent().addClass("partial");
+      });
+    </script>
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+
+      <div class="content">
+        <div class="header">
+          <div class="header-content">
+            <a class="index" href="index.html">« index</a>
+            <h3>Coverage for <span class="filename">/Users/itay/Work/mocha/lib/reporters/base.js</span> : <span class="percentage">76%</span></h3>
+            <div class="stats">
+              224  <span class="stat-descriptor">lines</span>     <span class="separator">| </span> 
+              172  <span class="stat-descriptor">run</span>        <span class="separator">| </span> 
+              52  <span class="stat-descriptor">missing</span>    <span class="separator">| </span> 
+              0  <span class="stat-descriptor">partial</span>      <span class="separator">| </span> 
+              53  <span class="stat-descriptor">blocks</span>     <span class="separator">| </span> 
+              4  <span class="stat-descriptor">blocks run</span>  <span class="separator">| </span> 
+              49  <span class="stat-descriptor">blocks missing</span>
+            </div>
+          </div>
+        </div>
+        <pre class='prettyprint lang-js linenums'>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Module dependencies.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  var tty = require('tty');</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Check if both stdio streams are associated with a tty.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  var isatty = tty.isatty(1) && tty.isatty(2);</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Expose `Base`.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports = module.exports = Base;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Enable coloring by default.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.useColors = isatty;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Default color map.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.colors = {</span>
+<span class='covered'>      'pass': 90</span>
+<span class='covered'>    , 'fail': 31</span>
+<span class='covered'>    , 'bright pass': 92</span>
+<span class='covered'>    , 'bright fail': 91</span>
+<span class='covered'>    , 'bright yellow': 93</span>
+<span class='covered'>    , 'pending': 36</span>
+<span class='covered'>    , 'suite': 0</span>
+<span class='covered'>    , 'error title': 0</span>
+<span class='covered'>    , 'error message': 31</span>
+<span class='covered'>    , 'error stack': 90</span>
+<span class='covered'>    , 'checkmark': 32</span>
+<span class='covered'>    , 'fast': 90</span>
+<span class='covered'>    , 'medium': 33</span>
+<span class='covered'>    , 'slow': 31</span>
+<span class='covered'>    , 'green': 32</span>
+<span class='covered'>    , 'light': 90</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Color `str` with the given `type`,</span>
+<span class='covered'>   * allowing colors to be disabled,</span>
+<span class='covered'>   * as well as user-defined color</span>
+<span class='covered'>   * schemes.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {String} type</span>
+<span class='covered'>   * @param {String} str</span>
+<span class='covered'>   * @return {String}</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  var color = exports.color = function(type, str) {</span>
+<span class='uncovered'>    if (!exports.useColors) return str;</span>
+<span class='uncovered'>    return '\033[' + exports.colors[type] + 'm' + str + '\033[0m';</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Expose term window size, with some</span>
+<span class='covered'>   * defaults for when stderr is not a tty.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.window = {</span>
+<span class='covered'>    width: isatty</span>
+<span class='covered'>      ? process.stdout.getWindowSize</span>
+<span class='covered'>        ? process.stdout.getWindowSize(1)[0]</span>
+<span class='covered'>        : tty.getWindowSize()[1]</span>
+<span class='covered'>      : 75</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Expose some basic cursor interactions</span>
+<span class='covered'>   * that are common among reporters.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.cursor = {</span>
+<span class='covered'>    hide: function(){</span>
+<span class='uncovered'>      process.stdout.write('\033[?25l');</span>
+<span class='covered'>    },</span>
+<span class='covered'>  </span>
+<span class='covered'>    show: function(){</span>
+<span class='uncovered'>      process.stdout.write('\033[?25h');</span>
+<span class='covered'>    }</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * A test is considered slow if it</span>
+<span class='covered'>   * exceeds the following value in milliseconds.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.slow = 75;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Outut the given `failures` as a list.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Array} failures</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.list = function(failures){</span>
+<span class='uncovered'>    console.error();</span>
+<span class='uncovered'>    failures.forEach(function(test, i){</span>
+<span class='uncovered'>      // format</span>
+<span class='uncovered'>      var fmt = color('error title', '  %s) %s:\n')</span>
+<span class='uncovered'>        + color('error message', '     %s')</span>
+<span class='uncovered'>        + color('error stack', '\n%s\n');</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      // msg</span>
+<span class='uncovered'>      var err = test.err</span>
+<span class='uncovered'>        , stack = err.stack</span>
+<span class='uncovered'>        , message = err.message || ''</span>
+<span class='uncovered'>        , index = stack.indexOf(message) + message.length</span>
+<span class='uncovered'>        , msg = stack.slice(0, index);</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      // indent stack trace without msg</span>
+<span class='uncovered'>      stack = stack.slice(index + 1)</span>
+<span class='uncovered'>        .replace(/^/gm, '  ');</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      console.error(fmt, i, test.fullTitle(), msg, stack);</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Initialize a new `Base` reporter.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * All other reporters generally</span>
+<span class='covered'>   * inherit from this reporter, providing</span>
+<span class='covered'>   * stats such as test duration, number</span>
+<span class='covered'>   * of tests passed / failed etc.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Runner} runner</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  function Base(runner) {</span>
+<span class='uncovered'>    var self = this</span>
+<span class='uncovered'>      , stats = this.stats = { suites: 0, tests: 0, passes: 0, failures: 0 }</span>
+<span class='uncovered'>      , failures = this.failures = [];</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    if (!runner) return;</span>
+<span class='uncovered'>    this.runner = runner;</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('start', function(){</span>
+<span class='uncovered'>      stats.start = new Date;</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('suite', function(suite){</span>
+<span class='uncovered'>      stats.suites = stats.suites || 0;</span>
+<span class='uncovered'>      stats.suites++;</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('test end', function(test){</span>
+<span class='uncovered'>      stats.tests = stats.tests || 0;</span>
+<span class='uncovered'>      stats.tests++;</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('pass', function(test){</span>
+<span class='uncovered'>      stats.passes = stats.passes || 0;</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      var medium = exports.slow / 2;</span>
+<span class='uncovered'>      test.speed = test.duration > exports.slow</span>
+<span class='uncovered'>        ? 'slow'</span>
+<span class='uncovered'>        : test.duration > medium</span>
+<span class='uncovered'>          ? 'medium'</span>
+<span class='uncovered'>          : 'fast';</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      stats.passes++;</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('fail', function(test, err){</span>
+<span class='uncovered'>      stats.failures = stats.failures || 0;</span>
+<span class='uncovered'>      stats.failures++;</span>
+<span class='uncovered'>      test.err = err;</span>
+<span class='uncovered'>      failures.push(test);</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('end', function(){</span>
+<span class='uncovered'>      stats.end = new Date;</span>
+<span class='uncovered'>      stats.duration = new Date - stats.start;</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  }</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Output common epilogue used by many of</span>
+<span class='covered'>   * the bundled reporters.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Base.prototype.epilogue = function(){</span>
+<span class='uncovered'>    var stats = this.stats</span>
+<span class='uncovered'>      , fmt;</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    console.log();</span>
+<span class='covered'>  </span>
+<span class='covered'>    // failure</span>
+<span class='covered'>    if (stats.failures) {</span>
+<span class='uncovered'>      fmt = color('bright fail', '  ✖')</span>
+<span class='uncovered'>        + color('fail', ' %d of %d tests failed')</span>
+<span class='uncovered'>        + color('light', ':')</span>
+<span class='covered'>  </span>
+<span class='uncovered'>      console.error(fmt, stats.failures, this.runner.total);</span>
+<span class='uncovered'>      Base.list(this.failures);</span>
+<span class='uncovered'>      console.error();</span>
+<span class='covered'>      return;</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='covered'>    // pass</span>
+<span class='uncovered'>    fmt = color('bright pass', '  ✔')</span>
+<span class='uncovered'>      + color('green', ' %d tests complete')</span>
+<span class='uncovered'>      + color('light', ' (%dms)');</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    console.log(fmt, stats.tests || 0, stats.duration);</span>
+<span class='uncovered'>    console.log();</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+</pre>
+        <a class="index" href="index.html">« index</a> | <a class="coverio" href="http://cover.io">cover.io</a>
+      </div>
+  </body>
+</html>

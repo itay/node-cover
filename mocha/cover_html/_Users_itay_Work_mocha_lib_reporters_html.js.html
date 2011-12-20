@@ -1,0 +1,334 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>/Users/itay/Work/mocha/lib/reporters/html.js -- cover.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="prettify.css" type="text/css" rel="stylesheet" />
+    <style type="text/css">
+      html, body {
+        font-family: georgia, serif;
+      }
+      
+      .content {
+      }
+      table#files-table {
+        table-layout: fixed;
+        width: 94%;
+      }
+
+      table#files-table td, table#files-table th {
+        width: 11%;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      
+      table#files-table td:first-child, table#files-table th:first-child {
+        width: 33%;
+      }
+        
+      li.L0,li.L1,li.L2,li.L3,li.L4, li.L5,li.L6,li.L7,li.L8, li.L9 { background: transparent; }
+      li.L1,li.L3,li.L5,li.L7,li.L9 { background: white; }
+       
+      li.covered {
+        border-left: 2px solid lime; 
+      }
+      
+      li.uncovered {
+        background: #FDD;
+        border-left: 2px solid red; 
+      }
+      
+      li.partial {
+        border-left: 2px solid #EE9; 
+        background: #FFA;
+      }
+      
+      .partialuncovered { 
+        background: #EE9; 
+      }
+      
+      ol.linenums { 
+        font-size: 10px;
+      }
+      
+      ol.linenums li  {
+        line-height: 16px;
+      }
+      
+      ol.linenums li span {
+        font-size: 12px;
+      }
+      
+      pre.prettyprint {
+        padding-top: 1em;
+        border: 5px;
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+        font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
+
+      }
+      
+      div.header {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border-bottom: 1px solid #EEE;
+        height: 90px;
+        background: #F8F8F8;
+      }
+      
+      div.header-content {
+        padding: 1em 3em;
+      }
+      
+      a.index {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      a.coverio {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      div.content > a.index {
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+      }
+      
+      div.header-content h3 {
+        font-weight: normal;
+      }
+      
+      span.filename {
+        font-weight: bold;
+      }
+      
+      span.percentage {
+        font-weight: bold;
+      }
+      
+      div.stats {
+        font-size: 13px;
+      }
+      
+      div.stats span.separator {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      
+      div.stats span.stat-descriptor {
+        color: gray;
+      }
+      
+    </style>
+
+    <script src="jquery.min.js"></script>
+    <script type="text/javascript" src="prettify.js"></script>
+    <script >
+      $(function() {
+        prettyPrint();
+        
+        $("li span.covered").parent().addClass("covered");
+        $("li span.uncovered").parent().addClass("uncovered");
+        $("li span.partial").parent().addClass("partial");
+      });
+    </script>
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+
+      <div class="content">
+        <div class="header">
+          <div class="header-content">
+            <a class="index" href="index.html">« index</a>
+            <h3>Coverage for <span class="filename">/Users/itay/Work/mocha/lib/reporters/html.js</span> : <span class="percentage">71%</span></h3>
+            <div class="stats">
+              153  <span class="stat-descriptor">lines</span>     <span class="separator">| </span> 
+              109  <span class="stat-descriptor">run</span>        <span class="separator">| </span> 
+              44  <span class="stat-descriptor">missing</span>    <span class="separator">| </span> 
+              0  <span class="stat-descriptor">partial</span>      <span class="separator">| </span> 
+              75  <span class="stat-descriptor">blocks</span>     <span class="separator">| </span> 
+              3  <span class="stat-descriptor">blocks run</span>  <span class="separator">| </span> 
+              72  <span class="stat-descriptor">blocks missing</span>
+            </div>
+          </div>
+        </div>
+        <pre class='prettyprint lang-js linenums'>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Module dependencies.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  var Base = require('./base')</span>
+<span class='covered'>    , utils = require('../utils')</span>
+<span class='covered'>    , Progress = require('../browser/progress')</span>
+<span class='covered'>    , escape = utils.escape;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Expose `Doc`.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports = module.exports = HTML;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Stats template.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  var statsTemplate = '<ul id="stats">'</span>
+<span class='covered'>    + '<li class="progress"><canvas width="50" height="50"></canvas></li>'</span>
+<span class='covered'>    + '<li class="passes">passes: <em>0</em></li>'</span>
+<span class='covered'>    + '<li class="failures">failures: <em>0</em></li>'</span>
+<span class='covered'>    + '<li class="duration">duration: <em>0</em>s</li>'</span>
+<span class='covered'>    + '</ul>';</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Initialize a new `Doc` reporter.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Runner} runner</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  function HTML(runner) {</span>
+<span class='uncovered'>    Base.call(this, runner);</span>
+<span class='covered'>  </span>
+<span class='covered'>    // TODO: clean up</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    var self = this</span>
+<span class='uncovered'>      , stats = this.stats</span>
+<span class='uncovered'>      , total = runner.total</span>
+<span class='uncovered'>      , root = $('#mocha')</span>
+<span class='uncovered'>      , stack = [root]</span>
+<span class='uncovered'>      , stat = $(statsTemplate).appendTo(root)</span>
+<span class='uncovered'>      , canvas = stat.find('canvas').get(0)</span>
+<span class='uncovered'>      , ctx, progress</span>
+<span class='covered'>  </span>
+<span class='covered'>    if (canvas.getContext) {</span>
+<span class='uncovered'>      ctx = canvas.getContext('2d');</span>
+<span class='uncovered'>      progress = new Progress;</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    if (!root.length) return error('#mocha div missing, add it to your document');</span>
+<span class='covered'>  </span>
+<span class='covered'>    if (progress) {</span>
+<span class='uncovered'>      progress.size(50);</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('suite', function(suite){</span>
+<span class='uncovered'>      if (suite.root) return;</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      // suite</span>
+<span class='uncovered'>      var el = $('&lt;div class="suite">&lt;h1>' + suite.title + '&lt;/h1>&lt;/div>');</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      // container</span>
+<span class='uncovered'>      stack[0].append(el);</span>
+<span class='uncovered'>      stack.unshift($('&lt;div>'));</span>
+<span class='uncovered'>      el.append(stack[0]);</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('suite end', function(suite){</span>
+<span class='uncovered'>      if (suite.root) return;</span>
+<span class='uncovered'>      stack.shift();</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('fail', function(test, err){</span>
+<span class='uncovered'>      if (err.uncaught) runner.emit('test end', test);</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    runner.on('test end', function(test){</span>
+<span class='uncovered'>      // TODO: add to stats</span>
+<span class='uncovered'>      var percent = stats.tests / total * 100 | 0;</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      if (progress) {</span>
+<span class='uncovered'>        // update progress bar</span>
+<span class='uncovered'>        progress.update(percent).draw(ctx);</span>
+<span class='uncovered'>      }</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      // update stats</span>
+<span class='uncovered'>      var ms = new Date - stats.start;</span>
+<span class='uncovered'>      stat.find('.passes em').text(stats.passes);</span>
+<span class='uncovered'>      stat.find('.failures em').text(stats.failures);</span>
+<span class='uncovered'>      stat.find('.duration em').text((ms / 1000).toFixed(2));</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      // test</span>
+<span class='uncovered'>      if (test.passed) {</span>
+<span class='uncovered'>        var el = $('&lt;div class="test pass">&lt;h2>' + escape(test.title) + '&lt;/h2>&lt;/div>')</span>
+<span class='uncovered'>      } else if (test.pending) {</span>
+<span class='uncovered'>        var el = $('&lt;div class="test pass pending">&lt;h2>' + escape(test.title) + '&lt;/h2>&lt;/div>')</span>
+<span class='uncovered'>      } else {</span>
+<span class='uncovered'>        var el = $('&lt;div class="test fail">&lt;h2>' + escape(test.title) + '&lt;/h2>&lt;/div>');</span>
+<span class='uncovered'>        var str = test.err.stack || test.err;</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>        // &lt;=IE7 stringifies to [Object Error]. Since it can be overloaded, we</span>
+<span class='uncovered'>        // check for the result of the stringifying.</span>
+<span class='uncovered'>        if ('[object Error]' == str) str = test.err.message;</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>        $('&lt;pre class="error">' + escape(str) + '&lt;/pre>').appendTo(el);</span>
+<span class='uncovered'>      }</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      // toggle code</span>
+<span class='uncovered'>      el.find('h2').toggle(function(){</span>
+<span class='uncovered'>        pre.slideDown('fast');</span>
+<span class='uncovered'>      }, function(){</span>
+<span class='uncovered'>        pre.slideUp('fast');</span>
+<span class='uncovered'>      });</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      // code</span>
+<span class='uncovered'>      // TODO: defer</span>
+<span class='uncovered'>      if (!test.pending) {</span>
+<span class='uncovered'>        var code = escape(clean(test.fn.toString()));</span>
+<span class='uncovered'>        var pre = $('&lt;pre>&lt;code>' + code + '&lt;/code>&lt;/pre>');</span>
+<span class='uncovered'>        pre.appendTo(el).hide();</span>
+<span class='uncovered'>      }</span>
+<span class='uncovered'>      stack[0].append(el);</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  }</span>
+<span class='covered'>  </span>
+<span class='covered'>  function error(msg) {</span>
+<span class='uncovered'>    $('&lt;div id="error">' + msg + '&lt;/div>').appendTo('body');</span>
+<span class='covered'>  }</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Strip the function definition from `str`,</span>
+<span class='covered'>   * and re-indent for pre whitespace.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  function clean(str) {</span>
+<span class='uncovered'>    str = str</span>
+<span class='uncovered'>      .replace(/^function *\(.*\) *{/, '')</span>
+<span class='uncovered'>      .replace(/\s+\}$/, '');</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    var spaces = str.match(/^\n?( *)/)[1].length</span>
+<span class='uncovered'>      , re = new RegExp('^ {' + spaces + '}', 'gm');</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    str = str</span>
+<span class='uncovered'>      .replace(re, '')</span>
+<span class='uncovered'>      .replace(/^\s+/, '');</span>
+<span class='covered'>  </span>
+<span class='covered'>    return str;</span>
+<span class='covered'>  }</span>
+<span class='covered'>  </span>
+</pre>
+        <a class="index" href="index.html">« index</a> | <a class="coverio" href="http://cover.io">cover.io</a>
+      </div>
+  </body>
+</html>

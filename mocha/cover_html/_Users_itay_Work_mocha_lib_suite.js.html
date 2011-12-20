@@ -1,0 +1,402 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>/Users/itay/Work/mocha/lib/suite.js -- cover.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="prettify.css" type="text/css" rel="stylesheet" />
+    <style type="text/css">
+      html, body {
+        font-family: georgia, serif;
+      }
+      
+      .content {
+      }
+      table#files-table {
+        table-layout: fixed;
+        width: 94%;
+      }
+
+      table#files-table td, table#files-table th {
+        width: 11%;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      
+      table#files-table td:first-child, table#files-table th:first-child {
+        width: 33%;
+      }
+        
+      li.L0,li.L1,li.L2,li.L3,li.L4, li.L5,li.L6,li.L7,li.L8, li.L9 { background: transparent; }
+      li.L1,li.L3,li.L5,li.L7,li.L9 { background: white; }
+       
+      li.covered {
+        border-left: 2px solid lime; 
+      }
+      
+      li.uncovered {
+        background: #FDD;
+        border-left: 2px solid red; 
+      }
+      
+      li.partial {
+        border-left: 2px solid #EE9; 
+        background: #FFA;
+      }
+      
+      .partialuncovered { 
+        background: #EE9; 
+      }
+      
+      ol.linenums { 
+        font-size: 10px;
+      }
+      
+      ol.linenums li  {
+        line-height: 16px;
+      }
+      
+      ol.linenums li span {
+        font-size: 12px;
+      }
+      
+      pre.prettyprint {
+        padding-top: 1em;
+        border: 5px;
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+        font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
+
+      }
+      
+      div.header {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border-bottom: 1px solid #EEE;
+        height: 90px;
+        background: #F8F8F8;
+      }
+      
+      div.header-content {
+        padding: 1em 3em;
+      }
+      
+      a.index {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      a.coverio {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      div.content > a.index {
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+      }
+      
+      div.header-content h3 {
+        font-weight: normal;
+      }
+      
+      span.filename {
+        font-weight: bold;
+      }
+      
+      span.percentage {
+        font-weight: bold;
+      }
+      
+      div.stats {
+        font-size: 13px;
+      }
+      
+      div.stats span.separator {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      
+      div.stats span.stat-descriptor {
+        color: gray;
+      }
+      
+    </style>
+
+    <script src="jquery.min.js"></script>
+    <script type="text/javascript" src="prettify.js"></script>
+    <script >
+      $(function() {
+        prettyPrint();
+        
+        $("li span.covered").parent().addClass("covered");
+        $("li span.uncovered").parent().addClass("uncovered");
+        $("li span.partial").parent().addClass("partial");
+      });
+    </script>
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+
+      <div class="content">
+        <div class="header">
+          <div class="header-content">
+            <a class="index" href="index.html">« index</a>
+            <h3>Coverage for <span class="filename">/Users/itay/Work/mocha/lib/suite.js</span> : <span class="percentage">81%</span></h3>
+            <div class="stats">
+              221  <span class="stat-descriptor">lines</span>     <span class="separator">| </span> 
+              181  <span class="stat-descriptor">run</span>        <span class="separator">| </span> 
+              40  <span class="stat-descriptor">missing</span>    <span class="separator">| </span> 
+              1  <span class="stat-descriptor">partial</span>      <span class="separator">| </span> 
+              53  <span class="stat-descriptor">blocks</span>     <span class="separator">| </span> 
+              8  <span class="stat-descriptor">blocks run</span>  <span class="separator">| </span> 
+              45  <span class="stat-descriptor">blocks missing</span>
+            </div>
+          </div>
+        </div>
+        <pre class='prettyprint lang-js linenums'>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Module dependencies.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  var EventEmitter = require('events').EventEmitter</span>
+<span class='covered'>    , debug = require('debug')('suite')</span>
+<span class='covered'>    , utils = require('./utils')</span>
+<span class='covered'>    , Hook = require('./hook');</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Expose `Suite`.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports = module.exports = Suite;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Create a new `Suite` with the given `title`</span>
+<span class='covered'>   * and parent `Suite`. When a suite with the</span>
+<span class='covered'>   * same title is already present, that suite</span>
+<span class='covered'>   * is returned to provide nicer reporter</span>
+<span class='covered'>   * and more flexible meta-testing.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Suite} parent</span>
+<span class='covered'>   * @param {String} title</span>
+<span class='covered'>   * @return {Suite}</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  exports.create = function(parent, title){</span>
+<span class='uncovered'>    var suite = new Suite(title);</span>
+<span class='uncovered'>    suite.parent = parent;</span>
+<span class='uncovered'>    title = suite.fullTitle();</span>
+<span class='uncovered'>    parent.addSuite(suite);</span>
+<span class='covered'>    return suite;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Initialize a new `Suite` with the given `title`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {String} title</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  function Suite(title) {</span>
+<span class='covered'>    this.title = title;</span>
+<span class='covered'>    this.suites = [];</span>
+<span class='covered'>    this.tests = [];</span>
+<span class='covered'>    this._beforeEach = [];</span>
+<span class='covered'>    this._beforeAll = [];</span>
+<span class='covered'>    this._afterEach = [];</span>
+<span class='covered'>    this._afterAll = [];</span>
+<span class='covered'>    this.root = !title;</span>
+<span class='covered'>    this._timeout = 2000;</span>
+<span class='covered'>  }</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Inherit from `EventEmitter.prototype`.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.__proto__ = EventEmitter.prototype;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Return a clone of this `Suite`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @return {Suite}</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.clone = function(){</span>
+<span class='uncovered'>    var suite = new Suite(this.title);</span>
+<span class='uncovered'>    debug('clone');</span>
+<span class='uncovered'>    suite.timeout(this.timeout());</span>
+<span class='covered'>    return suite;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Set timeout `ms` or short-hand such as "2s".</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Number|String} ms</span>
+<span class='covered'>   * @return {Suite|Number} for chaining</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.timeout = function(ms){</span>
+<span class='covered'>    if (0 == arguments.length) return this._timeout;</span>
+<span class='partial'>    if (String(ms).match(/s$/)) <span class='partialuncovered'>  ms = parseFloat(ms) * 1000;</span><span class='partialuncovered'>  parseFloat(ms)</span> * 1000;</span>
+<span class='covered'>    debug('timeout %d', ms);</span>
+<span class='covered'>    this._timeout = parseInt(ms, 10);</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run `fn(test[, done])` before running tests.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @return {Suite} for chaining</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.beforeAll = function(fn){</span>
+<span class='uncovered'>    var hook = new Hook('"before all" hook', fn);</span>
+<span class='uncovered'>    hook.parent = this;</span>
+<span class='uncovered'>    hook.timeout(this.timeout());</span>
+<span class='uncovered'>    this._beforeAll.push(hook);</span>
+<span class='uncovered'>    this.emit('beforeAll', hook);</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run `fn(test[, done])` after running tests.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @return {Suite} for chaining</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.afterAll = function(fn){</span>
+<span class='uncovered'>    var hook = new Hook('"after all" hook', fn);</span>
+<span class='uncovered'>    hook.parent = this;</span>
+<span class='uncovered'>    hook.timeout(this.timeout());</span>
+<span class='uncovered'>    this._afterAll.push(hook);</span>
+<span class='uncovered'>    this.emit('afterAll', hook);</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run `fn(test[, done])` before each test case.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @return {Suite} for chaining</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.beforeEach = function(fn){</span>
+<span class='uncovered'>    var hook = new Hook('"before each" hook', fn);</span>
+<span class='uncovered'>    hook.parent = this;</span>
+<span class='uncovered'>    hook.timeout(this.timeout());</span>
+<span class='uncovered'>    this._beforeEach.push(hook);</span>
+<span class='uncovered'>    this.emit('beforeEach', hook);</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run `fn(test[, done])` after each test case.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @return {Suite} for chaining</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.afterEach = function(fn){</span>
+<span class='uncovered'>    var hook = new Hook('"after each" hook', fn);</span>
+<span class='uncovered'>    hook.parent = this;</span>
+<span class='uncovered'>    hook.timeout(this.timeout());</span>
+<span class='uncovered'>    this._afterEach.push(hook);</span>
+<span class='uncovered'>    this.emit('afterEach', hook);</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Add a test `suite`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Suite} suite</span>
+<span class='covered'>   * @return {Suite} for chaining</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.addSuite = function(suite){</span>
+<span class='uncovered'>    suite.parent = this;</span>
+<span class='uncovered'>    suite.timeout(this.timeout());</span>
+<span class='uncovered'>    this.suites.push(suite);</span>
+<span class='uncovered'>    this.emit('suite', suite);</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Add a `test` to this suite.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Test} test</span>
+<span class='covered'>   * @return {Suite} for chaining</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.addTest = function(test){</span>
+<span class='uncovered'>    test.parent = this;</span>
+<span class='uncovered'>    test.timeout(this.timeout());</span>
+<span class='uncovered'>    this.tests.push(test);</span>
+<span class='uncovered'>    this.emit('test', test);</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Return the full title generated by recursively</span>
+<span class='covered'>   * concatenating the parent's full title.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @return {String}</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.fullTitle = function(){</span>
+<span class='covered'>    if (this.parent) {</span>
+<span class='uncovered'>      var full = this.parent.fullTitle();</span>
+<span class='uncovered'>      if (full) return full + ' ' + this.title;</span>
+<span class='covered'>    }</span>
+<span class='covered'>    return this.title;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Return the total number of tests.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @return {Number}</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Suite.prototype.total = function(){</span>
+<span class='uncovered'>    return utils.reduce(this.suites, function(sum, suite){</span>
+<span class='uncovered'>      return sum + suite.total();</span>
+<span class='uncovered'>    }, 0) + this.tests.length;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+</pre>
+        <a class="index" href="index.html">« index</a> | <a class="coverio" href="http://cover.io">cover.io</a>
+      </div>
+  </body>
+</html>

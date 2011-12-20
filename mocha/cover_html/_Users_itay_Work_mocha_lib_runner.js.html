@@ -1,0 +1,596 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>/Users/itay/Work/mocha/lib/runner.js -- cover.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="prettify.css" type="text/css" rel="stylesheet" />
+    <style type="text/css">
+      html, body {
+        font-family: georgia, serif;
+      }
+      
+      .content {
+      }
+      table#files-table {
+        table-layout: fixed;
+        width: 94%;
+      }
+
+      table#files-table td, table#files-table th {
+        width: 11%;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      
+      table#files-table td:first-child, table#files-table th:first-child {
+        width: 33%;
+      }
+        
+      li.L0,li.L1,li.L2,li.L3,li.L4, li.L5,li.L6,li.L7,li.L8, li.L9 { background: transparent; }
+      li.L1,li.L3,li.L5,li.L7,li.L9 { background: white; }
+       
+      li.covered {
+        border-left: 2px solid lime; 
+      }
+      
+      li.uncovered {
+        background: #FDD;
+        border-left: 2px solid red; 
+      }
+      
+      li.partial {
+        border-left: 2px solid #EE9; 
+        background: #FFA;
+      }
+      
+      .partialuncovered { 
+        background: #EE9; 
+      }
+      
+      ol.linenums { 
+        font-size: 10px;
+      }
+      
+      ol.linenums li  {
+        line-height: 16px;
+      }
+      
+      ol.linenums li span {
+        font-size: 12px;
+      }
+      
+      pre.prettyprint {
+        padding-top: 1em;
+        border: 5px;
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+        font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
+
+      }
+      
+      div.header {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border-bottom: 1px solid #EEE;
+        height: 90px;
+        background: #F8F8F8;
+      }
+      
+      div.header-content {
+        padding: 1em 3em;
+      }
+      
+      a.index {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      a.coverio {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      div.content > a.index {
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+      }
+      
+      div.header-content h3 {
+        font-weight: normal;
+      }
+      
+      span.filename {
+        font-weight: bold;
+      }
+      
+      span.percentage {
+        font-weight: bold;
+      }
+      
+      div.stats {
+        font-size: 13px;
+      }
+      
+      div.stats span.separator {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      
+      div.stats span.stat-descriptor {
+        color: gray;
+      }
+      
+    </style>
+
+    <script src="jquery.min.js"></script>
+    <script type="text/javascript" src="prettify.js"></script>
+    <script >
+      $(function() {
+        prettyPrint();
+        
+        $("li span.covered").parent().addClass("covered");
+        $("li span.uncovered").parent().addClass("uncovered");
+        $("li span.partial").parent().addClass("partial");
+      });
+    </script>
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+
+      <div class="content">
+        <div class="header">
+          <div class="header-content">
+            <a class="index" href="index.html">« index</a>
+            <h3>Coverage for <span class="filename">/Users/itay/Work/mocha/lib/runner.js</span> : <span class="percentage">72%</span></h3>
+            <div class="stats">
+              415  <span class="stat-descriptor">lines</span>     <span class="separator">| </span> 
+              301  <span class="stat-descriptor">run</span>        <span class="separator">| </span> 
+              114  <span class="stat-descriptor">missing</span>    <span class="separator">| </span> 
+              0  <span class="stat-descriptor">partial</span>      <span class="separator">| </span> 
+              158  <span class="stat-descriptor">blocks</span>     <span class="separator">| </span> 
+              2  <span class="stat-descriptor">blocks run</span>  <span class="separator">| </span> 
+              156  <span class="stat-descriptor">blocks missing</span>
+            </div>
+          </div>
+        </div>
+        <pre class='prettyprint lang-js linenums'>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Module dependencies.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  var EventEmitter = require('events').EventEmitter</span>
+<span class='covered'>    , debug = require('debug')('runner')</span>
+<span class='covered'>    , Test = require('./test')</span>
+<span class='covered'>    , utils = require('./utils')</span>
+<span class='covered'>    , noop = function(){};</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Expose `Runner`.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  module.exports = Runner;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Initialize a `Runner` for the given `suite`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * Events:</span>
+<span class='covered'>   *</span>
+<span class='covered'>   *   - `start`  execution started</span>
+<span class='covered'>   *   - `end`  execution complete</span>
+<span class='covered'>   *   - `suite`  (suite) test suite execution started</span>
+<span class='covered'>   *   - `suite end`  (suite) all tests (and sub-suites) have finished</span>
+<span class='covered'>   *   - `test`  (test) test execution started</span>
+<span class='covered'>   *   - `test end`  (test) test completed</span>
+<span class='covered'>   *   - `hook`  (hook) hook execution started</span>
+<span class='covered'>   *   - `hook end`  (hook) hook complete</span>
+<span class='covered'>   *   - `pass`  (test) test passed</span>
+<span class='covered'>   *   - `fail`  (test, err) test failed</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  function Runner(suite) {</span>
+<span class='uncovered'>    var self = this;</span>
+<span class='uncovered'>    this._globals = [];</span>
+<span class='uncovered'>    this.suite = suite;</span>
+<span class='uncovered'>    this.total = suite.total();</span>
+<span class='uncovered'>    this.failures = 0;</span>
+<span class='uncovered'>    this.on('test end', function(test){ self.checkGlobals(test); });</span>
+<span class='uncovered'>    this.on('hook end', function(hook){ self.checkGlobals(hook); });</span>
+<span class='uncovered'>    this.grep(/.*/);</span>
+<span class='uncovered'>    this.globals(utils.keys(global).concat(['errno']));</span>
+<span class='covered'>  }</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Inherit from `EventEmitter.prototype`.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.__proto__ = EventEmitter.prototype;</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run tests with full titles matching `re`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {RegExp} re</span>
+<span class='covered'>   * @return {Runner} for chaining</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.grep = function(re){</span>
+<span class='uncovered'>    debug('grep %s', re);</span>
+<span class='uncovered'>    this._grep = re;</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Allow the given `arr` of globals.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Array} arr</span>
+<span class='covered'>   * @return {Runner} for chaining</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.globals = function(arr){</span>
+<span class='uncovered'>    debug('globals %j', arr);</span>
+<span class='uncovered'>    utils.forEach(arr, function(arr){</span>
+<span class='uncovered'>      this._globals.push(arr);</span>
+<span class='uncovered'>    }, this);</span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Check for global variable leaks.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.checkGlobals = function(test){</span>
+<span class='covered'>    if (this.ignoreLeaks) return;</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    var leaks = utils.filter(utils.keys(global), function(key){</span>
+<span class='uncovered'>      return !~utils.indexOf(this._globals, key);</span>
+<span class='uncovered'>    }, this);</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    this._globals = this._globals.concat(leaks);</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    if (leaks.length > 1) {</span>
+<span class='uncovered'>      this.fail(test, new Error('global leaks detected: ' + leaks.join(', ') + ''));</span>
+<span class='covered'>    } else if (leaks.length) {</span>
+<span class='uncovered'>      this.fail(test, new Error('global leak detected: ' + leaks[0]));</span>
+<span class='covered'>    }</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Fail the given `test`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Test} test</span>
+<span class='covered'>   * @param {Error} err</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.fail = function(test, err){</span>
+<span class='uncovered'>    ++this.failures;</span>
+<span class='uncovered'>    test.failed = true;</span>
+<span class='uncovered'>    this.emit('fail', test, err);</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Fail the given `hook` with `err`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * Hook failures (currently) hard-end due</span>
+<span class='covered'>   * to that fact that a failing hook will</span>
+<span class='covered'>   * surely cause subsequent tests to fail,</span>
+<span class='covered'>   * causing jumbled reporting.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Hook} hook</span>
+<span class='covered'>   * @param {Error} err</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.failHook = function(hook, err){</span>
+<span class='uncovered'>    ++this.failures;</span>
+<span class='uncovered'>    this.fail(hook, err);</span>
+<span class='uncovered'>    this.emit('end');</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run hook `name` callbacks and then invoke `fn()`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {String} name</span>
+<span class='covered'>   * @param {Function} function</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.hook = function(name, fn){</span>
+<span class='uncovered'>    var suite = this.suite</span>
+<span class='uncovered'>      , hooks = suite['_' + name]</span>
+<span class='uncovered'>      , ms = suite._timeout</span>
+<span class='uncovered'>      , self = this</span>
+<span class='uncovered'>      , timer;</span>
+<span class='covered'>  </span>
+<span class='covered'>    function next(i) {</span>
+<span class='uncovered'>      var hook = hooks[i];</span>
+<span class='uncovered'>      if (!hook) return fn();</span>
+<span class='uncovered'>      self.currentRunnable = hook;</span>
+<span class='covered'>  </span>
+<span class='uncovered'>      self.emit('hook', hook);</span>
+<span class='covered'>  </span>
+<span class='uncovered'>      hook.on('error', function(err){</span>
+<span class='uncovered'>        self.failHook(hook, err);</span>
+<span class='uncovered'>      });</span>
+<span class='covered'>  </span>
+<span class='uncovered'>      hook.run(function(err){</span>
+<span class='uncovered'>        hook.removeAllListeners('error');</span>
+<span class='uncovered'>        if (err) return self.failHook(hook, err);</span>
+<span class='uncovered'>        self.emit('hook end', hook);</span>
+<span class='uncovered'>        next(++i);</span>
+<span class='uncovered'>      });</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    process.nextTick(function(){</span>
+<span class='uncovered'>      next(0);</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run hook `name` for the given array of `suites`</span>
+<span class='covered'>   * in order, and callback `fn(err)`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {String} name</span>
+<span class='covered'>   * @param {Array} suites</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.hooks = function(name, suites, fn){</span>
+<span class='uncovered'>    var self = this</span>
+<span class='uncovered'>      , orig = this.suite;</span>
+<span class='covered'>  </span>
+<span class='covered'>    function next(suite) {</span>
+<span class='uncovered'>      self.suite = suite;</span>
+<span class='covered'>  </span>
+<span class='uncovered'>      if (!suite) {</span>
+<span class='uncovered'>        self.suite = orig;</span>
+<span class='uncovered'>        return fn();</span>
+<span class='covered'>      }</span>
+<span class='covered'>  </span>
+<span class='uncovered'>      self.hook(name, function(err){</span>
+<span class='uncovered'>        if (err) {</span>
+<span class='uncovered'>          self.suite = orig;</span>
+<span class='uncovered'>          return fn(err);</span>
+<span class='uncovered'>        }</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>        next(suites.pop());</span>
+<span class='uncovered'>      });</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    next(suites.pop());</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run hooks from the top level down.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {String} name</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.hookUp = function(name, fn){</span>
+<span class='uncovered'>    var suites = [this.suite].concat(this.parents()).reverse();</span>
+<span class='uncovered'>    this.hooks(name, suites, fn);</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run hooks from the bottom up.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {String} name</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.hookDown = function(name, fn){</span>
+<span class='uncovered'>    var suites = [this.suite].concat(this.parents());</span>
+<span class='uncovered'>    this.hooks(name, suites, fn);</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Return an array of parent Suites from</span>
+<span class='covered'>   * closest to furthest.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @return {Array}</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.parents = function(){</span>
+<span class='uncovered'>    var suite = this.suite</span>
+<span class='uncovered'>      , suites = [];</span>
+<span class='uncovered'>    while (suite = suite.parent) suites.push(suite);</span>
+<span class='covered'>    return suites;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run the current test and callback `fn(err)`.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.runTest = function(fn){</span>
+<span class='uncovered'>    var test = this.test</span>
+<span class='uncovered'>      , self = this;</span>
+<span class='covered'>  </span>
+<span class='covered'>    try {</span>
+<span class='uncovered'>      test.on('error', function(err){</span>
+<span class='uncovered'>        self.fail(test, err);</span>
+<span class='uncovered'>      });</span>
+<span class='uncovered'>      test.run(fn);</span>
+<span class='covered'>    } catch (err) {</span>
+<span class='uncovered'>      fn(err);</span>
+<span class='covered'>    }</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run tests in the given `suite` and invoke</span>
+<span class='covered'>   * the callback `fn()` when complete.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Suite} suite</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.runTests = function(suite, fn){</span>
+<span class='uncovered'>    var self = this</span>
+<span class='uncovered'>      , tests = suite.tests</span>
+<span class='uncovered'>      , test;</span>
+<span class='covered'>  </span>
+<span class='covered'>    function next(err) {</span>
+<span class='covered'>      // next test</span>
+<span class='uncovered'>      test = tests.shift();</span>
+<span class='covered'>  </span>
+<span class='covered'>      // all done</span>
+<span class='uncovered'>      if (!test) return fn();</span>
+<span class='covered'>  </span>
+<span class='covered'>      // grep</span>
+<span class='uncovered'>      if (!self._grep.test(test.fullTitle())) return next();</span>
+<span class='covered'>  </span>
+<span class='covered'>      // pending</span>
+<span class='covered'>      if (test.pending) {</span>
+<span class='uncovered'>        self.emit('pending', test);</span>
+<span class='uncovered'>        self.emit('test end', test);</span>
+<span class='uncovered'>        return next();</span>
+<span class='covered'>      }</span>
+<span class='covered'>  </span>
+<span class='covered'>      // execute test and hook(s)</span>
+<span class='uncovered'>      self.emit('test', self.test = self.currentRunnable = test);</span>
+<span class='uncovered'>      self.hookDown('beforeEach', function(){</span>
+<span class='uncovered'>        self.runTest(function(err){</span>
+<span class='uncovered'>          if (err) {</span>
+<span class='uncovered'>            self.fail(test, err);</span>
+<span class='uncovered'>            self.emit('test end', test);</span>
+<span class='uncovered'>            return self.hookUp('afterEach', next);</span>
+<span class='uncovered'>          }</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>          test.passed = true;</span>
+<span class='uncovered'>          self.emit('pass', test);</span>
+<span class='uncovered'>          self.emit('test end', test);</span>
+<span class='uncovered'>          self.hookUp('afterEach', next);</span>
+<span class='uncovered'>        });</span>
+<span class='uncovered'>      });</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    this.next = next;</span>
+<span class='uncovered'>    next();</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run the given `suite` and invoke the</span>
+<span class='covered'>   * callback `fn()` when complete.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Suite} suite</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @api private</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.runSuite = function(suite, fn){</span>
+<span class='uncovered'>    var self = this</span>
+<span class='uncovered'>      , i = 0;</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    debug('run suite %s', suite.fullTitle());</span>
+<span class='uncovered'>    this.emit('suite', this.suite = suite);</span>
+<span class='covered'>  </span>
+<span class='covered'>    function next() {</span>
+<span class='uncovered'>      var curr = suite.suites[i++];</span>
+<span class='uncovered'>      if (!curr) return done();</span>
+<span class='uncovered'>      self.runSuite(curr, next);</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='covered'>    function done() {</span>
+<span class='uncovered'>      self.suite = suite;</span>
+<span class='uncovered'>      self.hook('afterAll', function(){</span>
+<span class='uncovered'>        self.emit('suite end', suite);</span>
+<span class='uncovered'>        fn();</span>
+<span class='uncovered'>      });</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    this.hook('beforeAll', function(){</span>
+<span class='uncovered'>      self.runTests(suite, next);</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Run the root suite and invoke `fn(failures)`</span>
+<span class='covered'>   * on completion.</span>
+<span class='covered'>   *</span>
+<span class='covered'>   * @param {Function} fn</span>
+<span class='covered'>   * @return {Runner} for chaining</span>
+<span class='covered'>   * @api public</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  Runner.prototype.run = function(fn){</span>
+<span class='uncovered'>    var self = this</span>
+<span class='uncovered'>      , fn = fn || function(){};</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    debug('start');</span>
+<span class='covered'>  </span>
+<span class='covered'>    // callback</span>
+<span class='uncovered'>    self.on('end', function(){</span>
+<span class='uncovered'>      debug('end');</span>
+<span class='uncovered'>      process.removeListener('uncaughtException', uncaught);</span>
+<span class='uncovered'>      fn(self.failures);</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='covered'>    // run suites</span>
+<span class='uncovered'>    this.emit('start');</span>
+<span class='uncovered'>    this.runSuite(this.suite, function(){</span>
+<span class='uncovered'>      debug('finished running');</span>
+<span class='uncovered'>      self.emit('end');</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  </span>
+<span class='covered'>    // uncaught exception</span>
+<span class='covered'>    function uncaught(err){</span>
+<span class='uncovered'>      var runnable = self.currentRunnable;</span>
+<span class='uncovered'>      debug('uncaught exception');</span>
+<span class='uncovered'>      runnable.clearTimeout();</span>
+<span class='uncovered'>      err.uncaught = true;</span>
+<span class='uncovered'>      self.fail(runnable, err);</span>
+<span class='covered'>  </span>
+<span class='covered'>      // recover from test</span>
+<span class='uncovered'>      if ('test' == runnable.type) {</span>
+<span class='uncovered'>        self.emit('test end', runnable);</span>
+<span class='uncovered'>        self.hookUp('afterEach', self.next);</span>
+<span class='covered'>      // bail on hooks</span>
+<span class='covered'>      } else {</span>
+<span class='uncovered'>        self.emit('end');</span>
+<span class='covered'>      }</span>
+<span class='covered'>    }</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    process.on('uncaughtException', uncaught);</span>
+<span class='covered'>  </span>
+<span class='covered'>    return this;</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+</pre>
+        <a class="index" href="index.html">« index</a> | <a class="coverio" href="http://cover.io">cover.io</a>
+      </div>
+  </body>
+</html>

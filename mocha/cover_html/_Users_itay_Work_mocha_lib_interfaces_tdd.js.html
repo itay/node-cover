@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>/Users/itay/Work/mocha/lib/interfaces/tdd.js -- cover.io</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le styles -->
+    <link href="bootstrap.css" rel="stylesheet">
+    <link href="prettify.css" type="text/css" rel="stylesheet" />
+    <style type="text/css">
+      html, body {
+        font-family: georgia, serif;
+      }
+      
+      .content {
+      }
+      table#files-table {
+        table-layout: fixed;
+        width: 94%;
+      }
+
+      table#files-table td, table#files-table th {
+        width: 11%;
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+      
+      table#files-table td:first-child, table#files-table th:first-child {
+        width: 33%;
+      }
+        
+      li.L0,li.L1,li.L2,li.L3,li.L4, li.L5,li.L6,li.L7,li.L8, li.L9 { background: transparent; }
+      li.L1,li.L3,li.L5,li.L7,li.L9 { background: white; }
+       
+      li.covered {
+        border-left: 2px solid lime; 
+      }
+      
+      li.uncovered {
+        background: #FDD;
+        border-left: 2px solid red; 
+      }
+      
+      li.partial {
+        border-left: 2px solid #EE9; 
+        background: #FFA;
+      }
+      
+      .partialuncovered { 
+        background: #EE9; 
+      }
+      
+      ol.linenums { 
+        font-size: 10px;
+      }
+      
+      ol.linenums li  {
+        line-height: 16px;
+      }
+      
+      ol.linenums li span {
+        font-size: 12px;
+      }
+      
+      pre.prettyprint {
+        padding-top: 1em;
+        border: 5px;
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+        font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
+
+      }
+      
+      div.header {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        border-bottom: 1px solid #EEE;
+        height: 90px;
+        background: #F8F8F8;
+      }
+      
+      div.header-content {
+        padding: 1em 3em;
+      }
+      
+      a.index {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      a.coverio {
+        text-decoration: none;
+        color: inherit;
+        font-size: 11px;
+      }
+      
+      div.content > a.index {
+        padding-left: 1.5em;
+        padding-bottom: 2em;
+      }
+      
+      div.header-content h3 {
+        font-weight: normal;
+      }
+      
+      span.filename {
+        font-weight: bold;
+      }
+      
+      span.percentage {
+        font-weight: bold;
+      }
+      
+      div.stats {
+        font-size: 13px;
+      }
+      
+      div.stats span.separator {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+      
+      div.stats span.stat-descriptor {
+        color: gray;
+      }
+      
+    </style>
+
+    <script src="jquery.min.js"></script>
+    <script type="text/javascript" src="prettify.js"></script>
+    <script >
+      $(function() {
+        prettyPrint();
+        
+        $("li span.covered").parent().addClass("covered");
+        $("li span.uncovered").parent().addClass("uncovered");
+        $("li span.partial").parent().addClass("partial");
+      });
+    </script>
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
+  </head>
+
+  <body>
+
+      <div class="content">
+        <div class="header">
+          <div class="header-content">
+            <a class="index" href="index.html">« index</a>
+            <h3>Coverage for <span class="filename">/Users/itay/Work/mocha/lib/interfaces/tdd.js</span> : <span class="percentage">82%</span></h3>
+            <div class="stats">
+              95  <span class="stat-descriptor">lines</span>     <span class="separator">| </span> 
+              78  <span class="stat-descriptor">run</span>        <span class="separator">| </span> 
+              17  <span class="stat-descriptor">missing</span>    <span class="separator">| </span> 
+              0  <span class="stat-descriptor">partial</span>      <span class="separator">| </span> 
+              20  <span class="stat-descriptor">blocks</span>     <span class="separator">| </span> 
+              2  <span class="stat-descriptor">blocks run</span>  <span class="separator">| </span> 
+              18  <span class="stat-descriptor">blocks missing</span>
+            </div>
+          </div>
+        </div>
+        <pre class='prettyprint lang-js linenums'>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * Module dependencies.</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  var Suite = require('../suite')</span>
+<span class='covered'>    , Test = require('../test');</span>
+<span class='covered'>  </span>
+<span class='covered'>  /**</span>
+<span class='covered'>   * TDD-style interface:</span>
+<span class='covered'>   *</span>
+<span class='covered'>   *      suite('Array', function(){</span>
+<span class='covered'>   *        suite('#indexOf()', function(){</span>
+<span class='covered'>   *          suiteSetup(function(){</span>
+<span class='covered'>   *</span>
+<span class='covered'>   *          });</span>
+<span class='covered'>   *          </span>
+<span class='covered'>   *          test('should return -1 when not present', function(){</span>
+<span class='covered'>   *</span>
+<span class='covered'>   *          });</span>
+<span class='covered'>   *</span>
+<span class='covered'>   *          test('should return the index when present', function(){</span>
+<span class='covered'>   *</span>
+<span class='covered'>   *          });</span>
+<span class='covered'>   *</span>
+<span class='covered'>   *          suiteTeardown(function(){</span>
+<span class='covered'>   *</span>
+<span class='covered'>   *          });</span>
+<span class='covered'>   *        });</span>
+<span class='covered'>   *      });</span>
+<span class='covered'>   *</span>
+<span class='covered'>   */</span>
+<span class='covered'>  </span>
+<span class='covered'>  module.exports = function(suite){</span>
+<span class='uncovered'>    var suites = [suite];</span>
+<span class='covered'>  </span>
+<span class='uncovered'>    suite.on('pre-require', function(context){</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      /**</span>
+<span class='uncovered'>       * Execute before each test case.</span>
+<span class='uncovered'>       */</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      context.setup = function(fn){</span>
+<span class='uncovered'>        suites[0].beforeEach(fn);</span>
+<span class='uncovered'>      };</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      /**</span>
+<span class='uncovered'>       * Execute after each test case.</span>
+<span class='uncovered'>       */</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      context.teardown = function(fn){</span>
+<span class='uncovered'>        suites[0].afterEach(fn);</span>
+<span class='uncovered'>      };</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      /**</span>
+<span class='uncovered'>       * Execute before the suite.</span>
+<span class='uncovered'>       */</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      context.suiteSetup = function(fn){</span>
+<span class='uncovered'>        suites[0].beforeAll(fn);</span>
+<span class='uncovered'>      };</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      /**</span>
+<span class='uncovered'>       * Execute after the suite.</span>
+<span class='uncovered'>       */</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      context.suiteTeardown = function(fn){</span>
+<span class='uncovered'>        suites[0].afterAll(fn);</span>
+<span class='uncovered'>      };</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      /**</span>
+<span class='uncovered'>       * Describe a "suite" with the given `title`</span>
+<span class='uncovered'>       * and callback `fn` containing nested suites</span>
+<span class='uncovered'>       * and/or tests.</span>
+<span class='uncovered'>       */</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      context.suite = function(title, fn){</span>
+<span class='uncovered'>        var suite = Suite.create(suites[0], title);</span>
+<span class='uncovered'>        suites.unshift(suite);</span>
+<span class='uncovered'>        fn();</span>
+<span class='uncovered'>        suites.shift();</span>
+<span class='uncovered'>      };</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      /**</span>
+<span class='uncovered'>       * Describe a specification or test-case</span>
+<span class='uncovered'>       * with the given `title` and callback `fn`</span>
+<span class='uncovered'>       * acting as a thunk.</span>
+<span class='uncovered'>       */</span>
+<span class='uncovered'>  </span>
+<span class='uncovered'>      context.test = function(title, fn){</span>
+<span class='uncovered'>        suites[0].addTest(new Test(title, fn));</span>
+<span class='uncovered'>      };</span>
+<span class='uncovered'>    });</span>
+<span class='covered'>  };</span>
+<span class='covered'>  </span>
+</pre>
+        <a class="index" href="index.html">« index</a> | <a class="coverio" href="http://cover.io">cover.io</a>
+      </div>
+  </body>
+</html>
