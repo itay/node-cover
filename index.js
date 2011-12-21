@@ -229,7 +229,7 @@ CoverageData.prototype.coverage = function() {
 
 // Get statistics for the entire file, including per-line code coverage
 // and block-level coverage
-CoverageData.prototype.stats = function() {
+CoverageData.prototype.stats = function() {    
     var missing = this.missing();
     var filedata = fs.readFileSync(this.filename, 'utf8').split('\n');
     
@@ -273,6 +273,7 @@ CoverageData.prototype.stats = function() {
 };
 
 var globals = {};
+var coverageData = {};
 
 // Create the execution environment for the file
 var createEnvironment = function(module, filename) {
@@ -323,11 +324,37 @@ var cli = function() {
     return require('./bin/cover');
 }
 
+var instrument = function(filename, context) {
+    var data = fs.readFileSync(filename, 'utf8');
+        
+    // Replace the #!/ in the beginning of executables, because runInNewContext
+    // really doesn't like it.
+    data = data.substr(0, "#!/".length) === "#!/" ? data.replace("#!/", "//#!/") : data;
+        
+    // Wrap it in a function for the return case.
+    var bunkerized = bunker("(function() { " + data + "})();");
+    
+    var coverage = coverageData[filename] = new CoverageData(filename, bunkerized);
+    
+    // Add the coverage logic to the bunkerized source
+    bunkerized.on('node', coverage.visit.bind(coverage));
+    bunkerized.assign(context);
+    
+    // Instrument the code
+    var wrapper = '(function(ctxt) { with(ctxt) { return '+Module.wrap(bunkerized.compile())+'; } })';
+    var compiledWrapper = vm.runInThisContext(wrapper, filename, true)(context);
+        
+    // And execute it
+    var module = context.module;
+    var args = [context.exports, context.require, module, filename, context.__dirname];
+    return compiledWrapper.apply(module.exports, args);
+};
+
 var cover = function(fileRegex, ignore, passedInGlobals) {
     globals[module.parent.filename] = passedInGlobals;
     
+    coverageData = {};
     var originalRequire = require.extensions['.js'];
-    var coverageData = {};
     var match = null;
     var target = this;
     
@@ -393,6 +420,7 @@ module.exports = {
     cover: cover,
     createEnvironment: createEnvironment,
     cli: cli,
+    instrument: instrument,
     reporters: {
         html:   require('./reporters/html'),
         plain:  require('./reporters/plain'),
