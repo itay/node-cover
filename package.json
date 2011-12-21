@@ -37,6 +37,5 @@
     },
     "license" : "MIT/X11",
     "engine" : { "node" : ">=0.4" },
-    "private": true,
     "preferGlobal": "true"
 }
