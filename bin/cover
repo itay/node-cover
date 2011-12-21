@@ -414,7 +414,7 @@
                 };
                 
                 allStats.push([
-                    filename, 
+                    path.relative(process.cwd(), filename), 
                     Math.floor(stats.percentage * 100) + "%", 
                     stats.missing, 
                     stats.total,
