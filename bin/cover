@@ -454,7 +454,7 @@
             var headers = ["Filename", "% Covered", "Missed Lines", "# Lines", "% Blocks", "Missed Blocks", "# Blocks"];
             var fileUrls = {};
             _.each(files, function(file) {
-                fileUrls[file] =  file.replace(/\//g, "_") + ".html";
+                fileUrls[path.relative(process.cwd(), file)] =  file.replace(/\//g, "_") + ".html";
             });
             
             var indexHtml = indexTemplate({ headers: headers, data: allStats, fileUrls: fileUrls });
