@@ -228,7 +228,6 @@
         
         // We add some unique things to get the coverage hook to work
         context.__u_ignore = ignore;
-        context.__u_context = context;
         
         return context;
     };
@@ -244,19 +243,25 @@
         var file = path.resolve(file);
         var context = createContext(file, options, ignore);
         
+        var code = fs.readFileSync(file, "utf-8");
+        
+        // Replace the #!/ in the beginning of executables, because runInNewContext
+        // really doesn't like it.
+        code = code.substr(0, "#!/".length) === "#!/" ? code.replace("#!/", "//#!/") : code;
+        
         var pathToCover = path.resolve(path.resolve(__dirname), "..", "index.js");
         delete require.cache[pathToCover];
         
         var template = _.template( 
             "var cover = require('<%= cover %>'); var coverage = cover.cover(null, __u_ignore, global);\n" + 
             "(function() {\n" +
-            "process.nextTick(function() { try { cover.instrument('<%=codeFile%>', __u_context); \n } catch(ex) { } });" + 
+            "process.nextTick(function() { try { <%=code%>\n } catch(ex) { /* DO NOTHING */ } });" + 
             "})();\n" + 
             "coverage;"
         );
         var codeToRun = template({
             cover: pathToCover,
-            codeFile: file
+            code: code
         });
         process.on('uncaughtException', function() { /* DO NOTHING */ })
         try {
