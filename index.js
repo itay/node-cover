@@ -272,6 +272,8 @@ CoverageData.prototype.stats = function() {
     };
 };
 
+var globals = {};
+
 // Create the execution environment for the file
 var createEnvironment = function(module, filename) {
     // Create a new requires
@@ -294,9 +296,10 @@ var createEnvironment = function(module, filename) {
     require.cache = Module._cache;
 
     // Copy over the globals
+    var g = globals[module.parent.filename];
     var ctxt = {};
-    for(var k in global) {
-        ctxt[k] = global[k];
+    for(var k in g) {
+        ctxt[k] = g[k];
     }
 
     // And create our context
@@ -309,6 +312,8 @@ var createEnvironment = function(module, filename) {
     ctxt.module     = module;
     ctxt.global     = ctxt;
 
+    globals[module.filename] = ctxt;
+
     return ctxt;
 };
 
@@ -318,7 +323,9 @@ var cli = function() {
     return require('./bin/cover');
 }
 
-var cover = function(fileRegex, ignore) {
+var cover = function(fileRegex, ignore, passedInGlobals) {
+    globals[module.parent.filename] = passedInGlobals;
+    
     var originalRequire = require.extensions['.js'];
     var coverageData = {};
     var match = null;
@@ -334,7 +341,6 @@ var cover = function(fileRegex, ignore) {
     }
         
     require.extensions['.js'] = function(module, filename) {
-            
         if(!match.test(filename)) return originalRequire(module, filename);
         
         // If the specific file is to be ignored

@@ -16,7 +16,7 @@
     var _             = require('underscore');
     var _s            = require('underscore.string');
     var compression   = require('compress-buffer');
-    var commander     = require('commander');
+    var commander     = require('../contrib/commander');
     
     var patch_console = require('../utils/console');
     var cover         = require("../index.js");
@@ -214,6 +214,7 @@
           return Module._resolveFilename(request, newModule)[1];
         }
         newRequire.main = newModule;
+        newRequire.cache = Module._cache;
         
         // Set everything into the context
         context.require = newRequire;
@@ -232,7 +233,7 @@
     };
     
     // Run a file with coverage enabled in a new context
-    var runFile = function(file, options, ignore) {
+    var runFile = function(file, options, ignore) {        
         options = options || [];
         var optionString = "";
         for(var i = 0; i < options.length; i++) {
@@ -249,9 +250,10 @@
         code = code.substr(0, "#!/".length) === "#!/" ? code.replace("#!/", "//#!/") : code;
         
         var pathToCover = path.resolve(path.resolve(__dirname), "..", "index.js");
+        delete require.cache[pathToCover];
         
-        var template = _.template(
-            "var cover = require('<%= cover %>'); var coverage = cover.cover(null, __u_ignore);\n" + 
+        var template = _.template( 
+            "var cover = require('<%= cover %>'); var coverage = cover.cover(null, __u_ignore, global);\n" + 
             "(function() {\n" +
             "process.nextTick(function() { try { <%=code%>\n } catch(ex) { /* DO NOTHING */ } });" + 
             "})();\n" + 
@@ -516,8 +518,7 @@
     
     /* ====== Commands ====== */
     
-    var run = function(file, cmdline, config, ignore) {     
-        
+    var run = function(file, cmdline, config, ignore) {            
         // Run the file
         var coverage = runFile(file, cmdline, ignore);
         
