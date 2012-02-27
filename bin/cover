@@ -11,12 +11,12 @@
     var path          = require('path');
     var vm            = require("vm");
     var crypto        = require('crypto');
-    var Module        = require('module').Module;
-    var Table         = require('cli-table');
+    var Module        = require('module').Module;   
     var _             = require('underscore');
     var _s            = require('underscore.string');
     var compression   = require('compress-buffer');
     var commander     = require('../contrib/commander');
+    var Table         = require('../contrib/cli-table');
     
     var patch_console = require('../utils/console');
     var cover         = require("../index.js");
@@ -479,7 +479,7 @@
             
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
-                cover.reporters.cli.format(coverageData[filename], table);
+                table.push(cover.reporters.cli.format(coverageData[filename]));
             }
             
             console.log(table.toString());
