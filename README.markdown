@@ -7,21 +7,24 @@ can easily see where you are missing coverage.
 
 ### Standing on the shoulders of giants
 
-I would be amiss to not mention that the hard work in this library were done
-by [substack] with his work on [bunker], and by [Chris Dickinson] with his
-work on [runforcover]. In reality, Cover is a fork of runforcover, fixing
-some of the issues and making it more usable.
+I would be amiss to not mention that the hard work in this library was
+by [Chris Dickinson] with his work on [runforcover]. In reality, Cover is 
+a fork of runforcover, fixing some of the issues and making it more usable.
+
+The original version of Cover used [substack]'s excellent [bunker] library,
+but it has recently been moved to using [esprima] and a new code homegrown
+instrumentation library.
 
 ### Known Issues
 
 There are currently a few known issues that I am working on:
 
-1. You cannot use process.stdin in your program. This is because of a bug in
-Node itself, where it will cause the program to not exit. Working on a fix.
+1. If you use 'global' to pass state between modules (mocha does this, for
+example), then you might run into issues. Cover runs modules as if they
+were executed with `NODE_MODULE_CONTEXTS` was set.
 
-2. There is currently a bug in [bunker] in regards to wrapping code incorrectly,
-causing code to become not-executable. This happens in `vows`, for example. The 
-workaround is to simply exclude those files from code coverage.
+2. If you start new node processes, Cover won't work with those, as
+it instruments by hooking into `require`.
 
 ### Usage
 
@@ -82,6 +85,7 @@ on the command line:
 
 > cover --config path/to/config --ignore path/to/ignore run myfile.js
 
+[esprima]: http://www.esprima.org
 [substack]: https://github.com/substack
 [bunker]: https://github.com/substack/node-bunker
 [Chris Dickinson]: https://github.com/chrisdickinson
