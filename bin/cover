@@ -161,16 +161,11 @@
         // This is to make sure that when we clone
         // process (which we do from our local
         // copy), we clone the right argv.
+        process.stdin.resume();
+        process.stdin.pause();
         var newProcess = {};
         for(var k in process) {
-            if (k !== "stdin") {
-                newProcess[k] = process[k];
-            } 
-            else {
-                newProcess.__defineGetter__('stdin', function() {
-                    throw new Error("Cannot use stdin while in coverage mode!");
-                });
-            }
+            newProcess[k] = process[k];
         }  
         newProcess.argv = process.argv = ["node", file].concat(options);
         newProcess.reallyExit = function() {
