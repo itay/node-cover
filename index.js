@@ -1,4 +1,4 @@
-var bunker         = require('bunker')
+var instrument     = require('./instrument')
 var Module         = require('module').Module;
 var path           = require('path');
 var fs             = require('fs');
@@ -6,24 +6,31 @@ var vm             = require('vm');
 var _              = require('underscore');
 
 // Coverage tracker
-function CoverageData (filename, bunker) {
-    this.bunker = bunker;
+function CoverageData (filename, instrumentor) {
+    this.instrumentor = instrumentor;
     this.filename = filename;
     this.nodes = {};
-    this.source = this.bunker.sources[0];
+    this.visitedBlocks = {};
+    this.source = instrumentor.source;
 };
 
 // Note that a node has been visited
 CoverageData.prototype.visit = function(node) {
-    var node = this.nodes[node.id] = this.nodes[node.id] || {node:node, count:0}
+    var node = this.nodes[node.id] = (this.nodes[node.id] || {node:node, count:0})
     node.count++;
+};
+
+// Note that a node has been visited
+CoverageData.prototype.visitBlock = function(blockIndex) {
+    var block = this.visitedBlocks[blockIndex] = (this.visitedBlocks[blockIndex] || {count:0})
+    block.count++;
 };
 
 // Get all the nodes we did not see
 CoverageData.prototype.missing = function() {
     // Find all the nodes which we haven't seen
     var nodes = this.nodes;
-    var missing = this.bunker.nodes.filter(function(node) {
+    var missing = this.instrumentor.filter(function(node) {
         return !nodes[node.id];
     });
 
@@ -34,7 +41,7 @@ CoverageData.prototype.missing = function() {
 CoverageData.prototype.seen = function() {  
     // Find all the nodes we have seen
     var nodes = this.nodes;
-    var seen = this.bunker.nodes.filter(function(node) {
+    var seen = this.instrumentor.filter(function(node) {
         return !!nodes[node.id];
     });
     
@@ -42,55 +49,20 @@ CoverageData.prototype.seen = function() {
 };
 
 // Calculate node coverage statistics
-CoverageData.prototype.blocks = function() {  
-    var parentToNode = {};
-    var nodeToParent = {};
-    var parents = [];
-    var blockId = 0;
-    var seenParent = {};
-    
-    var start = new Date();
-    var numBlocks = 0;
-    
-    // For each node, find its parent
-    this.bunker.nodes.forEach(function(node) {
-        var parent = node.parent() || {start: {}, end: {}, label: function() { return ""; }};
-        
-        // This is a hack to get a unique identifier to the parent
-        var key = [parent.start.line, parent.start.col, parent.end.line, parent.end.col, parent.label()].join(",");
-        
-        if (seenParent.hasOwnProperty(key)) {
-            nodeToParent[node.id] = seenParent[key];
-        }
-        else {
-            numBlocks++;
-            nodeToParent[node.id] = blockId;
-            seenParent[key] = blockId++;
-        }
-    });
-    
-    // Note which parents (blocks) we've already seen
-    var nodes = this.nodes;
-    var seenBlocks = {};
-    this.bunker.nodes.forEach(function(node) {
-        if (nodes[node.id]) {
-              seenBlocks[nodeToParent[node.id]] = true;
-        }
-    });
-    
-    // Calculate the stats and return them
-    var numSeenBlocks = _.keys(seenBlocks).length;
-    var numMissingBlocks = numBlocks - numSeenBlocks;
+CoverageData.prototype.blocks = function() {
+    var totalBlocks = this.instrumentor.blockCounter;
+    var numSeenBlocks = 0;
+    for(var index in this.visitedBlocks) {
+        numSeenBlocks++;
+    }
+    var numMissingBlocks = totalBlocks - numSeenBlocks;
     
     var toReturn = {
-        total: numBlocks,
+        total: totalBlocks,
         seen: numSeenBlocks,
         missing: numMissingBlocks,
-        percentage: numSeenBlocks / numBlocks
+        percentage: numSeenBlocks / totalBlocks
     };
-          
-    var end = new Date();
-    //console.log("Blocks took: " + (end-start));
     
     return toReturn;
 };
@@ -102,32 +74,32 @@ var explodeNodes = function(coverageData, fileData) {
     
     // Get only the multi-line nodes.
     var multiLineNodes = missing.filter(function(node) {
-        return (node.node[0].start.line < node.node[0].end.line);
+        return (node.loc.start.line < node.loc.end.line);
     });
     
     for(var i = 0; i < multiLineNodes.length; i++) {
         // Get the current node and delta
         var node = multiLineNodes[i];
-        var lineDelta = node.node[0].end.line - node.node[0].start.line + 1;
+        var lineDelta = node.loc.end.line - node.loc.start.line + 1;
         
         for(var j = 0; j < lineDelta; j++) {
             // For each line in the multi-line node, we'll create a 
             // new node, and we set the start and end columns
             // to the correct vlaues.
-            var curLine = node.node[0].start.line + j;
+            var curLine = node.loc.start.line + j;
             var startCol = 0;
             var endCol = fileData[curLine].length;;
                 
-            if (curLine === node.node[0].start.line) {
-                startCol = node.node[0].start.col;
+            if (curLine === node.loc.start.line) {
+                startCol = node.loc.start.column;
             }
-            else if (curLine === node.node[0].end.line) {
+            else if (curLine === node.loc.end.line) {
                 startCol = 0;
-                endCol = node.node[0].end.col;
+                endCol = node.loc.end.column;
             }
             
             var newNode = {
-                node: [
+                loc:
                     {
                         start: {
                             line: curLine,
@@ -138,7 +110,6 @@ var explodeNodes = function(coverageData, fileData) {
                             col: endCol
                         }
                     }
-                ]
             };
             
             newNodes.push(newNode);
@@ -158,7 +129,7 @@ CoverageData.prototype.coverage = function() {
     seen = {};
     
     this.seen().forEach(function(node) {
-        seen[node.node[0].start.line] = true;
+        seen[node.loc.start.line] = true;
     });
     
     // Add all the new multi-line nodes.
@@ -167,35 +138,35 @@ CoverageData.prototype.coverage = function() {
     var seenNodes = {};
     missingLines = missingLines.sort(
         function(lhs, rhs) {
-          var lhsNode = lhs.node[0];
-          var rhsNode = rhs.node[0];
+          var lhsNode = lhs.loc;
+          var rhsNode = rhs.loc;
           
           // First try to sort based on line
           return lhsNode.start.line < rhsNode.start.line ? -1 : // first try line
                  lhsNode.start.line > rhsNode.start.line ? 1  :
-                 lhsNode.start.col < rhsNode.start.col ? -1 : // then try start col
-                 lhsNode.start.col > rhsNode.start.col ? 1 :
-                 lhsNode.end.col < rhsNode.end.col ? -1 : // then try end col
-                 lhsNode.end.col > rhsNode.end.col ? 1 : 
+                 lhsNode.start.column < rhsNode.start.column ? -1 : // then try start col
+                 lhsNode.start.column > rhsNode.start.column ? 1 :
+                 lhsNode.end.column < rhsNode.end.column ? -1 : // then try end col
+                 lhsNode.end.column > rhsNode.end.column ? 1 : 
                  0; // then just give up and say they are equal
     }).filter(function(node) {
         // If it is a multi-line node, we can just ignore it
-        if (node.node[0].start.line < node.node[0].end.line) {
+        if (node.loc.start.line < node.loc.end.line) {
             return false;
         }
         
         // We allow multiple nodes per line, but only one node per
-        // start column (due to how bunker works)
+        // start column (due to how instrumented works)
         var okay = false;
-        if (seenNodes.hasOwnProperty(node.node[0].start.line)) {
-            var isNew = (seenNodes[node.node[0].start.line].indexOf(node.node[0].start.col) < 0);
+        if (seenNodes.hasOwnProperty(node.loc.start.line)) {
+            var isNew = (seenNodes[node.loc.start.line].indexOf(node.loc.start.column) < 0);
             if (isNew) {
-                seenNodes[node.node[0].start.line].push(node.node[0].start.col);
+                seenNodes[node.loc.start.line].push(node.loc.start.column);
                 okay = true;
             }
         }
         else {
-            seenNodes[node.node[0].start.line] = [node.node[0].start.col];
+            seenNodes[node.loc.start.line] = [node.loc.start.column];
             okay = true;
         }
         
@@ -206,11 +177,11 @@ CoverageData.prototype.coverage = function() {
     
     missingLines.forEach(function(node) {
         // For each missing line, add some information for it
-        var line = node.node[0].start.line + 1;
-        var startCol = node.node[0].start.col;
-        var endCol = node.node[0].end.col;
+        var line = node.loc.start.line;
+        var startCol = node.loc.start.column;
+        var endCol = node.loc.end.column;
         var source = fileData[line - 1];
-        var partial = seen.hasOwnProperty(line - 1) && seen[line - 1];
+        var partial = seen.hasOwnProperty(line) && seen[line];
         
         if (coverage.hasOwnProperty(line)) {
             coverage[line].missing.push({startCol: startCol, endCol: endCol});
@@ -235,23 +206,23 @@ CoverageData.prototype.stats = function() {
     
     var observedMissing = [];
     var linesInfo = missing.sort(function(lhs, rhs) {
-        return lhs.node[0].start.line < rhs.node[0].start.line ? -1 :
-               lhs.node[0].start.line > rhs.node[0].start.line ? 1  :
+        return lhs.loc.start.line < rhs.loc.start.line ? -1 :
+               lhs.loc.start.line > rhs.loc.start.line ? 1  :
                0;
         }).filter(function(node) {
             // Make sure we don't double count missing lines due to multi-line
             // issues
-            var okay = (observedMissing.indexOf(node.node[0].start.line) < 0);
+            var okay = (observedMissing.indexOf(node.loc.start.line) < 0);
             if(okay) {
-              observedMissing.push(node.node[0].start.line);
+              observedMissing.push(node.loc.start.line);
             }
             
             return okay;
         }).map(function(node, idx, all) {
             // For each missing line, add info for it
             return {
-                lineno: node.node[0].start.line + 1,
-                source: function() { return filedata[node.node[0].start.line]; }
+                lineno: node.loc.start.line,
+                source: function() { return filedata[node.loc.start.line - 1]; }
             };
         });
         
@@ -267,7 +238,7 @@ CoverageData.prototype.stats = function() {
         seen: numSeenLines,
         total: numLines,
         coverage: this.coverage(),
-        source: this.bunker.sources[0],
+        source: this.source,
         blocks: this.blocks()
     };
 };
@@ -357,19 +328,20 @@ var cover = function(fileRegex, ignore, passedInGlobals) {
           }
         } while(full !== path.dirname(full));
         
-        // Create the context, read the file, bunkerize it, and setup
+        // Create the context, read the file, instrument it, and setup
         // the coverage tracker
         var context = target.createEnvironment(module, filename);
-        var data = fs.readFileSync(filename, 'utf8');
-        var bunkerized = bunker(data);
-        var coverage = coverageData[filename] = new CoverageData(filename, bunkerized);
+        var data = fs.readFileSync(filename, 'utf8').toString();
+        var instrumented = instrument(data);
+        var coverage = coverageData[filename] = new CoverageData(filename, instrumented);
             
-        // Add the coverage logic to the bunkerized source
-        bunkerized.on('node', coverage.visit.bind(coverage));
-        bunkerized.assign(context);
+        // Add the coverage logic to the instrumented source
+        instrumented.on('node', coverage.visit.bind(coverage));
+        instrumented.on('block', coverage.visitBlock.bind(coverage));
+        instrumented.addToContext(context);
         
         // Instrument the code
-        var wrapper = '(function(ctxt) { with(ctxt) { return '+Module.wrap(bunkerized.compile())+'; } })';
+        var wrapper = '(function(ctxt) { with(ctxt) { return '+Module.wrap(instrumented.instrumentedSource)+'; } })';
         var compiledWrapper = vm.runInThisContext(wrapper, filename, true)(context);
             
         // And execute it

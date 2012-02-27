@@ -1,0 +1,349 @@
+var fs           = require('fs');
+var esprima      = require('./contrib/esprima');
+var EventEmitter = require('events').EventEmitter;
+
+esprima.Syntax = {
+    AssignmentExpression: 'AssignmentExpression',
+    ArrayExpression: 'ArrayExpression',
+    BlockStatement: 'BlockStatement',
+    BinaryExpression: 'BinaryExpression',
+    BreakStatement: 'BreakStatement',
+    CallExpression: 'CallExpression',
+    CatchClause: 'CatchClause',
+    ConditionalExpression: 'ConditionalExpression',
+    ContinueStatement: 'ContinueStatement',
+    DoWhileStatement: 'DoWhileStatement',
+    DebuggerStatement: 'DebuggerStatement',
+    EmptyStatement: 'EmptyStatement',
+    ExpressionStatement: 'ExpressionStatement',
+    ForStatement: 'ForStatement',
+    ForInStatement: 'ForInStatement',
+    FunctionDeclaration: 'FunctionDeclaration',
+    FunctionExpression: 'FunctionExpression',
+    Identifier: 'Identifier',
+    IfStatement: 'IfStatement',
+    Literal: 'Literal',
+    LabeledStatement: 'LabeledStatement',
+    LogicalExpression: 'LogicalExpression',
+    MemberExpression: 'MemberExpression',
+    NewExpression: 'NewExpression',
+    ObjectExpression: 'ObjectExpression',
+    Program: 'Program',
+    Property: 'Property',
+    ReturnStatement: 'ReturnStatement',
+    SequenceExpression: 'SequenceExpression',
+    SwitchStatement: 'SwitchStatement',
+    SwitchCase: 'SwitchCase',
+    ThisExpression: 'ThisExpression',
+    ThrowStatement: 'ThrowStatement',
+    TryStatement: 'TryStatement',
+    UnaryExpression: 'UnaryExpression',
+    UpdateExpression: 'UpdateExpression',
+    VariableDeclaration: 'VariableDeclaration',
+    VariableDeclarator: 'VariableDeclarator',
+    WhileStatement: 'WhileStatement',
+    WithStatement: 'WithStatement'
+};
+
+module.exports = function(src) {
+    var instrumentor = new Instrumentor(src);
+    return instrumentor;
+};
+
+exports.Instrumentor = Instrumentor;
+
+function Instrumentor(src) {
+    // Setup our names
+    this.names = {
+        statement: this.generateName(6, "__statement_"),
+        expression: this.generateName(6, "__expression_"),
+        block: this.generateName(6, "__block_")
+    };
+    
+    // Setup the node store
+    this.nodes = {};
+    
+    // Setup the counters
+    this.blockCounter = 0;
+    this.nodeCounter = 0;
+    
+    if (src) {
+        this.instrumentedSource = this.instrument(src);
+    }
+};
+
+Instrumentor.prototype = new EventEmitter;
+
+Instrumentor.prototype.filter = function(action) {
+    action = action || function() {};
+    
+    var filtered = [];
+    for(var key in this.nodes) {
+        if (this.nodes.hasOwnProperty(key)) {
+            var node = this.nodes[key];
+            if (action(node)) {
+                filtered.push(node);
+            }
+        }
+    }
+    
+    return filtered;
+};
+
+Instrumentor.prototype.instrument = function(code) {
+    this.source = code;
+    
+    var tree = esprima.parse(code, {range: true, loc: true});
+    this.wrap(tree);
+    
+    return esprima.generate(tree);
+};
+
+Instrumentor.prototype.addToContext = function(context) {
+    context = context || {};
+    
+    var that = this;
+    
+    context[that.names.expression] = function (i) {
+        var node = that.nodes[i];
+        that.emit('node', node);
+        
+        return function (expr) {
+            return expr;
+        };
+    };
+    
+    context[that.names.statement] = function (i) {
+        var node = that.nodes[i];
+        that.emit('node', node);
+    };
+    
+    context[that.names.block] = function (i) {
+        that.emit('block', i);
+    };
+    
+    return context;
+};
+
+Instrumentor.prototype.generateName = function (len, prefix) {
+    var name = '';
+    var lower = '$'.charCodeAt(0);
+    var upper = 'z'.charCodeAt(0);
+    
+    while (name.length < len) {
+        var c = String.fromCharCode(Math.floor(
+            Math.random() * (upper - lower + 1) + lower
+        ));
+        if ((name + c).match(/^[A-Za-z_$][A-Za-z0-9_$]*$/)) name += c;
+    }
+    
+    return prefix + name;
+};
+
+Instrumentor.prototype.traverseAndWrap = function(object, visitor, master) {
+    var key, child, parent, path;
+
+    parent = (typeof master === 'undefined') ? [] : master;
+
+    var returned = visitor.call(null, object, parent);
+    if (returned === false) {
+        return;
+    }
+    
+    for (key in object) {
+        if (object.hasOwnProperty(key)) {
+            child = object[key];
+            path = [ object ];
+            path.push(parent);
+            var newNode;
+            if (typeof child === 'object' && child !== null && !object.noCover) {
+                newNode = this.traverseAndWrap(child, visitor, path);
+            }
+            
+            if (newNode) {
+                object[key] = newNode;
+            }
+        }
+    }
+    
+    return object.noCover ? undefined : returned;
+};
+
+Instrumentor.prototype.wrap = function(tree) {    
+    var that = this;
+    this.traverseAndWrap(tree, function(node, path) {
+      
+        if (node.noCover) {
+            return;
+        }
+        
+        parent = path[0];
+        switch(node.type) {
+            case esprima.Syntax.ExpressionStatement:
+            case esprima.Syntax.ThrowStatement:
+            case esprima.Syntax.VariableDeclaration: {
+                if (parent && (
+                    (parent.type === esprima.Syntax.ForInStatement) ||
+                    (parent.type === esprima.Syntax.ForStatement)
+                    )) {
+                    return;
+                }
+                
+                var newNode = {
+                    "type": "BlockStatement",
+                    "body": [
+                        {
+                            "type": "ExpressionStatement",
+                            "expression": {
+                                "type": "CallExpression",
+                                "callee": {
+                                    "type": "Identifier",
+                                    "name": that.names.statement
+                                },
+                                "arguments": [
+                                    {
+                                        "type": "Literal",
+                                        "value": that.nodeCounter++
+                                    }
+                                ]
+                            }
+                        },
+                        node
+                    ]
+                }
+                that.nodes[that.nodeCounter - 1] = node;
+                node.id = that.nodeCounter - 1;
+                
+                return newNode;
+            }
+            case esprima.Syntax.BinaryExpression:
+            case esprima.Syntax.UpdateExpression:
+            case esprima.Syntax.LogicalExpression:
+            case esprima.Syntax.CallExpression: {
+                var newNode = {
+                    "type": "CallExpression",
+                    "callee": {
+                        "type": "CallExpression",
+                        "callee": {
+                            "type": "Identifier",
+                            "name": that.names.expression
+                        },
+                        "arguments": [
+                            {
+                                "type": "Literal",
+                                "value": that.nodeCounter++
+                            }
+                        ]
+                    },
+                    "arguments": [
+                        node
+                    ]
+                }
+                that.nodes[that.nodeCounter - 1] = node;
+                node.id = that.nodeCounter - 1;
+                
+                return newNode
+            }
+            case esprima.Syntax.BlockStatement: {
+                var newNode = {
+                    "type": "ExpressionStatement",
+                    "expression": {
+                        "type": "CallExpression",
+                        "callee": {
+                            "type": "Identifier",
+                            "name": that.names.block
+                        },
+                        "arguments": [
+                            {
+                                "type": "Literal",
+                                "value": that.blockCounter++
+                            }
+                        ]
+                    },
+                    "noCover": true
+                }
+                
+                node.body.unshift(newNode)
+                break;
+            }
+            case esprima.Syntax.ForStatement:
+            case esprima.Syntax.ForInStatement:
+            case esprima.Syntax.LabeledStatement:
+            case esprima.Syntax.WhileStatement:
+            case esprima.Syntax.WithStatement:
+            case esprima.Syntax.CatchClause:
+            case esprima.Syntax.DoWhileStatement: {
+                if (node.body && node.body.type !== esprima.Syntax.BlockStatement) {
+                    var newNode = {
+                        "type": "BlockStatement",
+                        "body": [
+                            node.body
+                        ]
+                    }
+                    
+                    node.body = newNode;
+                }
+                break;
+            }
+            case esprima.Syntax.TryStatement: {
+                if (node.block && node.block.type !== esprima.Syntax.BlockStatement) {
+                    var newNode = {
+                        "type": "BlockStatement",
+                        "body": [
+                            node.block
+                        ]
+                    }
+                    
+                    node.block = newNode;
+                }
+                if (node.finalizer && node.finalizer.type !== esprima.Syntax.BlockStatement) {
+                    var newNode = {
+                        "type": "BlockStatement",
+                        "body": [
+                            node.block
+                        ]
+                    }
+                    
+                    node.finalizer = newNode;
+                }
+                break;
+            }
+            case esprima.Syntax.SwitchCase: {
+                if (node.consequent && node.consequent.length > 0 &&
+                    (node.consequent.length != 1 || node.consequent[0].type !== esprima.Syntax.BlockStatement)) {
+                    var newNode = {
+                        "type": "BlockStatement",
+                        "body": node.consequent
+                    }
+                    
+                    node.consequent = [newNode];
+                }
+                break;
+            }
+            case esprima.Syntax.IfStatement: {
+                if (node.consequent && node.consequent.type !== esprima.Syntax.BlockStatement) {
+                    var newNode = {
+                        "type": "BlockStatement",
+                        "body": [
+                            node.consequent
+                        ]
+                    }
+                    
+                    node.consequent = newNode;
+                }
+                if (node.alternate && node.alternate.type !== esprima.Syntax.BlockStatement 
+                    && node.alternate.type !== esprima.Syntax.IfStatement) {
+                    var newNode = {
+                        "type": "BlockStatement",
+                        "body": [
+                            node.alternate
+                        ]
+                    }
+                    
+                    node.alternate = newNode;
+                }
+                break;
+            }
+        }
+    });
+}

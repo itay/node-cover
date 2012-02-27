@@ -529,7 +529,12 @@
                 // For debugging purposes, make sure we can print things
                 patch_console.patch();
                 coverage(function(coverageData) {
-                    saveCoverageData(coverageData, config);
+                    try {
+                        saveCoverageData(coverageData, config);
+                    }
+                    catch(e) {
+                        console.log(e.stack);
+                    }
                 });
             }
         );

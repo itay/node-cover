@@ -37,7 +37,7 @@ module.exports = {
                         
                         lineOutput.push(sourceLine.slice(curStart, curEnd).replace(/</g, "&lt;"));
                         
-                        lineOutput.push("<span class='partialuncovered'>  ");
+                        lineOutput.push("<span class='partialuncovered'>");
                         lineOutput.push(sourceLine.slice(lineInfo.missing[j].startCol, lineInfo.missing[j].endCol + 1).replace(/</g, "&lt;"));
                         lineOutput.push("</span>");
                     }

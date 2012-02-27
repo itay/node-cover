@@ -9,7 +9,6 @@
         "test" : "test"
     },
     "dependencies" : {
-        "bunker" : "0.1.x",
         "cli-table": "0.0.x",
         "underscore": "1.2.x",
         "underscore.string": "2.0.x",
@@ -35,6 +34,6 @@
         "url" : "http://www.pretzelwisdom.com"
     },
     "license" : "MIT/X11",
-    "engine" : { "node" : ">=0.4" },
+    "engine" : { "node" : ">=0.6" },
     "preferGlobal": "true"
 }

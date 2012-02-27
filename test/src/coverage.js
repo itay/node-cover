@@ -1,27 +1,41 @@
+var a = 5 || (c = 5);
+
 exports.something = function(a) {
   if(a > 0) {
     b = 1;
-    
     c = 2;
-    
     d = 3;
-    
   } else {
     b = 1;
-    
-    c = 5;
-    
-    d = 10;
-    
+    c = function() {
+      return 5;
+    };
+    d = function() { return 6; 
+      a = 5;};
     f = 11; 
-    
     if (1) f = 1; if (0) f = 2;
-    
-    return [a + 1, a + 2];
-    
+    return [a + 1, a + 2, c(), d()];
     return a - 1;
   }
 };
+
+a = function() {
+  return true;
+}
+
+b = function() {
+  aa = 5;
+  return true;
+}
+
+c = function() {
+  bb = 6;
+  return false;
+}
+
+if (a() || b() && c()) {
+  c = 5;
+}
 
 b = function() {
   if (a < 0) return;
@@ -37,35 +51,10 @@ b2 = function() {
   c2 = 3;  
 }
 
-b3 = function() {
-  a3 = 1;
-  b3 = 2;
-  c3 = 3;  
-}
+d = 3;
+e = (function() { return 6; })()
 
-b4 = function() {
-  a4 = 1;
-  b4 = 2;
-  c4 = 3;  
-}
-
-b5 = function() {
-  a5 = 1;
-  b5 = 2;
-  c5 = 3;  
-}
-
-b6 = function() {
-  a6 = 1;
-  b6 = 2;
-  c6 = 3;  
-}
-
-b7 = function() {
-  a7 = 1;
-  b7 = 2;
-  c7 = 3;  
-}
+f = d || (g = 3);
 
 
 /*c = 1;
