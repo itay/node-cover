@@ -1,6 +1,6 @@
 {
     "name" : "cover",
-    "version" : "0.0.1",
+    "version" : "0.1.0",
     "description" : "Native JavaScript code coverage",
     "main" : "index.js",
     "directories" : {
@@ -14,9 +14,6 @@
         "underscore.string": "2.0.x",
         "compress-buffer": "0.5.x"
     },
-    "scripts" : {
-        "test" : "node test/index.js"
-    },
     "repository" : {
         "type" : "git",
         "url" : "http://github.com/itay/node-cover.git"
@@ -24,7 +21,7 @@
     "keywords" : [
         "code",
         "coverage",
-        "bunker",
+        "esprima",
         "cover",
         "test"
     ],
