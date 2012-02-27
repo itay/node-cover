@@ -126,7 +126,7 @@ CoverageData.prototype.coverage = function() {
     
     // Get a dictionary of all the lines we did observe being at least
     // partially covered
-    seen = {};
+    var seen = {};
     
     this.seen().forEach(function(node) {
         seen[node.loc.start.line] = true;
@@ -365,6 +365,14 @@ module.exports = {
     cover: cover,
     createEnvironment: createEnvironment,
     cli: cli,
+    hook: function() {
+        var c = cli();
+        c.hook.apply(c, arguments);  
+    },
+    hookAndReport: function() {
+        var c = cli();
+        c.hookAndReport.apply(c, arguments);  
+    },
     reporters: {
         html:   require('./reporters/html'),
         plain:  require('./reporters/plain'),

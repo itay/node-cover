@@ -562,6 +562,43 @@
         (reporterHandlers[reporterName] || reporterHandlers.__catch_all)(coverageData.files, config, reporter);
     }
     
+    var hook = function(configFile, ignoreFile) {
+        var files = getOptionsAndIgnore({config: configFile, ignore: ignoreFile});
+        var config = files.config;
+        var ignore = files.ignore;
+        
+        var cover = require('../index.js');
+        coverage = cover.cover(null, ignore, global);
+        
+        // Setup the on exit listener
+        process.on(
+            "exit", 
+            function() {
+                // For debugging purposes, make sure we can print things
+                patch_console.patch();
+                coverage(function(coverageData) {
+                    try {
+                        saveCoverageData(coverageData, config);
+                    }
+                    catch(e) {
+                        console.log(e.stack);
+                    }
+                });
+            }
+        );
+    }
+    
+    var hookAndReport = function(reporterName, configFile, ignoreFile) {
+        var files = getOptionsAndIgnore({config: configFile, ignore: ignoreFile});
+        var config = files.config;
+        var ignore = files.ignore;
+        
+        hook(configFile, ignoreFile);
+        process.on("exit", function() {
+            report(reporterName, null, config, ignore); 
+        });
+    }
+    
     /* ====== Command Line Parsing ====== */
     
     commander
@@ -597,7 +634,9 @@
     module.exports = {
         parse: function(argv) { return commander.parse(argv); },
         run: run,
-        report: report
+        report: report,
+        hook: hook,
+        hookAndReport: hookAndReport
     };
 })();
 
