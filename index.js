@@ -198,9 +198,27 @@ CoverageData.prototype.coverage = function() {
     return coverage;
 };
 
+CoverageData.prototype.prepare = function() {
+    var store = require('./coverage_store').getStore(this.filename);
+      
+    for(var index in store.nodes) {
+        if (store.nodes.hasOwnProperty(index)) {
+            this.nodes[index] = {node: this.instrumentor.nodes[index], count: store.nodes[index].count};
+        }
+    }
+    
+    for(var index in store.blocks) {
+        if (store.blocks.hasOwnProperty(index)) {
+            this.visitedBlocks[index] = {count: store.blocks[index].count};
+        }
+    }
+};
+
 // Get statistics for the entire file, including per-line code coverage
 // and block-level coverage
 CoverageData.prototype.stats = function() {
+    this.prepare();
+    
     var missing = this.missing();
     var filedata = fs.readFileSync(this.filename, 'utf8').split('\n');
     
@@ -243,64 +261,37 @@ CoverageData.prototype.stats = function() {
     };
 };
 
-var globals = {};
-
-// Create the execution environment for the file
-var createEnvironment = function(module, filename) {
-    // Create a new requires
-    var req = function(path) {
-        return Module._load(path, module);
-    };
-    
-    // Add various pieces of information to it
-    req.resolve = function(request) {
-        return Module._resolveFilename(request, module)[1];
-    };
-    
-    req.paths = Module._paths;
-    req.main = process.mainModule;
-    req.extensions = Module._extensions;
-    req.registerExtension = function() {
-        throw new Error('require.registerExtension() removed. Use ' +
-                        'require.extensions instead.');
-    }
-    require.cache = Module._cache;
-
-    // Copy over the globals
-    var g = globals[module.parent.filename];
-    var ctxt = {};
-    for(var k in g) {
-        ctxt[k] = g[k];
-    }
-
-    // And create our context
-    ctxt.require    = req;
-    ctxt.exports    = module.exports;
-    ctxt.__filename = filename;
-    ctxt.__dirname  = path.dirname(filename);
-    ctxt.process    = process;
-    ctxt.console    = console;
-    ctxt.module     = module;
-    ctxt.global     = ctxt;
-
-    globals[module.filename] = ctxt;
-
-    return ctxt;
-};
-
 // Require the CLI module of cover and return it,
 // in case anyone wants to use it programmatically
 var cli = function() {
     return require('./bin/cover');
+};
+
+var addInstrumentationHeader = function(template, filename, instrumented, coverageStorePath) {
+    var template = _.template(template);
+    var header = template({
+        instrumented: instrumented,
+        coverageStorePath: coverageStorePath,
+        filename: filename
+    });
+    
+    return header + instrumented.instrumentedSource;
+};
+
+var stripBOM = function(content) {
+  // Remove byte order marker. This catches EF BB BF (the UTF-8 BOM)
+  // because the buffer-to-string conversion in `fs.readFileSync()`
+  // translates it to FEFF, the UTF-16 BOM.
+  if (content.charCodeAt(0) === 0xFEFF) {
+    content = content.slice(1);
+  }
+  return content;
 }
 
-var cover = function(fileRegex, ignore, passedInGlobals) {
-    globals[module.parent.filename] = passedInGlobals;
-    
+var cover = function(fileRegex, ignore) {    
     var originalRequire = require.extensions['.js'];
     var coverageData = {};
     var match = null;
-    var target = this;
     
     ignore = ignore || {};
     
@@ -311,8 +302,13 @@ var cover = function(fileRegex, ignore, passedInGlobals) {
         match = new RegExp(fileRegex ? (fileRegex.replace(/\//g, '\\/').replace(/\./g, '\\.')) : ".*", '');
     }
         
+    var pathToCoverageStore = path.resolve(path.resolve(__dirname), "coverage_store.js");
+    var templatePath = path.resolve(path.resolve(__dirname), "templates", "instrumentation_header.js");
+    var template = fs.readFileSync(templatePath, 'utf-8');
+    
     require.extensions['.js'] = function(module, filename) {
         if(!match.test(filename)) return originalRequire(module, filename);
+        if(filename === pathToCoverageStore) return originalRequire(module, filename);
         
         // If the specific file is to be ignored
         var full = path.resolve(filename); 
@@ -328,25 +324,15 @@ var cover = function(fileRegex, ignore, passedInGlobals) {
           }
         } while(full !== path.dirname(full));
         
-        // Create the context, read the file, instrument it, and setup
-        // the coverage tracker
-        var context = target.createEnvironment(module, filename);
-        var data = fs.readFileSync(filename, 'utf8').toString();
+        var data = stripBOM(fs.readFileSync(filename, 'utf8'));
+        data = data.replace(/^\#\!.*/, '');
+        
         var instrumented = instrument(data);
         var coverage = coverageData[filename] = new CoverageData(filename, instrumented);
-            
-        // Add the coverage logic to the instrumented source
-        instrumented.on('node', coverage.visit.bind(coverage));
-        instrumented.on('block', coverage.visitBlock.bind(coverage));
-        instrumented.addToContext(context);
         
-        // Instrument the code
-        var wrapper = '(function(ctxt) { with(ctxt) { return '+Module.wrap(instrumented.instrumentedSource)+'; } })';
-        var compiledWrapper = vm.runInThisContext(wrapper, filename, true)(context);
-            
-        // And execute it
-        var args = [context.exports, context.require, module, filename, context.__dirname];
-        return compiledWrapper.apply(module.exports, args);
+        var newCode = addInstrumentationHeader(template, filename, instrumented, pathToCoverageStore);
+        
+        return module._compile(newCode, filename);
     };
     
     // Setup the data retrieval and release functions
@@ -363,7 +349,6 @@ var cover = function(fileRegex, ignore, passedInGlobals) {
 
 module.exports = {
     cover: cover,
-    createEnvironment: createEnvironment,
     cli: cli,
     hook: function() {
         var c = cli();
