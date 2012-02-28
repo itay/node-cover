@@ -61,7 +61,7 @@ CoverageData.prototype.blocks = function() {
         total: totalBlocks,
         seen: numSeenBlocks,
         missing: numMissingBlocks,
-        percentage: numSeenBlocks / totalBlocks
+        percentage: totalBlocks ? numSeenBlocks / totalBlocks : 1
     };
     
     return toReturn;
@@ -220,7 +220,7 @@ CoverageData.prototype.stats = function() {
     this.prepare();
     
     var missing = this.missing();
-    var filedata = fs.readFileSync(this.filename, 'utf8').split('\n');
+    var filedata = this.instrumentor.source.split('\n');
     
     var observedMissing = [];
     var linesInfo = missing.sort(function(lhs, rhs) {
@@ -288,6 +288,57 @@ var stripBOM = function(content) {
   return content;
 }
 
+var load = function(datas) {    
+    var combinedCoverage = {};
+    
+    _.each(datas, function(data) {  
+        _.each(data.files, function(fileData, filename) {
+            var instrumentor = {
+                source: fileData.instrumentor.source,
+                nodes: fileData.instrumentor.nodes,
+                nodeCounter: fileData.instrumentor.nodeCounter,
+                blockCounter: fileData.instrumentor.blockCounter,
+            };
+            
+            var coverage = new CoverageData(filename, new instrument.Instrumentor());
+            coverage.instrumentor.source = fileData.instrumentor.source;
+            coverage.instrumentor.nodes = fileData.instrumentor.nodes;
+            coverage.instrumentor.nodeCounter = fileData.instrumentor.nodeCounter;
+            coverage.instrumentor.blockCounter = fileData.instrumentor.blockCounter;
+            
+            coverage.source = coverage.instrumentor.source;
+            coverage.hash = fileData.hash;
+            coverage.nodes = fileData.nodes;
+            coverage.visitedBlocks = fileData.blocks;
+            
+            if (combinedCoverage.hasOwnProperty(filename)) {
+                var coverageSoFar = combinedCoverage[filename];
+                
+                if (coverageSoFar.hash !== coverage.hash) {
+                    throw new Error("Multiple versions of file '" + filename + "' in coverage data!");
+                }
+                
+                // Merge nodes
+                _.each(coverage.nodes, function(nodeData, index) {
+                    var nodeDataSoFar = coverageSoFar.nodes[index] = (coverageSoFar.nodes[index] || {node: nodeData.node, count: 0});
+                    nodeDataSoFar.count += nodeData.count;
+                });
+                
+                // Merge blocks
+                _.each(coverage.visitedBlocks, function(blockData, index) {
+                    var blockDataSoFar = coverageSoFar.visitedBlocks[index] = (coverageSoFar.visitedBlocks[index] || {count: 0});
+                    blockDataSoFar.count += blockData.count;
+                });
+            }
+            else {
+                combinedCoverage[filename] = coverage;
+            }
+        });
+    });
+    
+    return combinedCoverage;
+}
+
 var cover = function(fileRegex, ignore) {    
     var originalRequire = require.extensions['.js'];
     var coverageData = {};
@@ -350,13 +401,26 @@ var cover = function(fileRegex, ignore) {
 module.exports = {
     cover: cover,
     cli: cli,
+    load: load,
     hook: function() {
         var c = cli();
         c.hook.apply(c, arguments);  
     },
+    combine: function() {
+        var c = cli();
+        c.combine.apply(c, arguments);  
+    },
     hookAndReport: function() {
         var c = cli();
         c.hookAndReport.apply(c, arguments);  
+    },
+    hookAndCombine: function() {
+        var c = cli();
+        c.hookAndCombine.apply(c, arguments);  
+    },
+    hookAndCombineAndReport: function() {
+        var c = cli();
+        c.hookAndCombineAndReport.apply(c, arguments);  
     },
     reporters: {
         html:   require('./reporters/html'),

@@ -175,7 +175,7 @@
                 Module.runMain(file, null, true)
             }
             catch(ex) {
-                console.log("AAA", ex.stack);
+                console.log(ex.stack);
             }
         });
         
@@ -183,8 +183,11 @@
     };
     
     /* ====== Save/Load Coverage Data ====== */
-    
-    var saveCoverageData = function(coverageData, configs) {
+    var saveCoverageData = function(coverageData, configs, noPrecombine) {
+        if (!noPrecombine) {
+            savePrecombinedCoverageData(coverageData, configs);
+        }
+        
         // Setup the information we're going to save
         var files = {};
         var toSave = {
@@ -192,8 +195,7 @@
             files: files
         };
         
-        _.each(coverageData, function(fileData, fileName, lst) { 
-            
+        _.each(coverageData, function(fileData, fileName, lst) {
             // For each file, we hash the source to get a "version ID" 
             // for it
             var stats = fileData.stats();
@@ -230,6 +232,59 @@
         
         // Write out the file
         var dataFilename = path.join(dataDirectory, configs.prefix + dataHash);
+        fs.writeFileSync(dataFilename, compressedData);
+    };
+    
+    var savePrecombinedCoverageData = function(coverageData, configs) {
+        // Setup the information we're going to save
+        var files = {};
+        var toSave = {
+            version: "0.2.0",
+            files: files
+        };
+        
+        var coverageStore = require('../coverage_store'); 
+        
+        _.each(coverageData, function(fileData, fileName, lst) { 
+            var store = coverageStore.getStore(fileName);
+            
+            // For each file, we hash the source to get a "version ID" 
+            // for it
+            var fileSource = fileData.source;
+            var md5 = crypto.createHash('md5');
+            md5.update(fileSource);
+            var hash = md5.digest('hex');
+            
+            // We also save the stats and the hash,
+            // which is everything we need in order
+            // to be able to generate reports
+            files[fileName] = {
+                nodes: store.nodes,
+                blocks: store.blocks,
+                hash: hash,
+                instrumentor: fileData.instrumentor.objectify()
+            }
+        });
+        
+        // Turn it into JSON, compress it, and write it out
+        var data = JSON.stringify(toSave);
+        
+        // Get the ID for this data (md5 hash)
+        var dataMd5 = crypto.createHash('md5');
+        dataMd5.update(data);
+        var dataHash = dataMd5.digest('hex');
+        
+        // Compress the data
+        var compressedData = compression.compress(new Buffer(data, "utf-8"));
+        
+        // Make the directory
+        var dataDirectory = configs.dataDirectory;
+        if (!path.existsSync(dataDirectory)) {
+            fs.mkdirSync(dataDirectory, "0755");
+        }
+        
+        // Write out the file
+        var dataFilename = path.join(dataDirectory, "precombined_" + configs.prefix + dataHash);
         fs.writeFileSync(dataFilename, compressedData);
     };
     
@@ -285,6 +340,38 @@
             fileData.source = stats.source;
         });
         
+        return coverageData;
+    };
+    
+    var loadPrecombinedCoverageData = function(configs) {
+        var dataDirectory = configs.dataDirectory;
+        var dataPrefix = configs.prefix;
+        
+        var filesInDataDirectory = fs.readdirSync(dataDirectory);
+        var files = _.filter(filesInDataDirectory, function(file) { 
+            return _s.startsWith(file, "precombined_" + dataPrefix); 
+        }).map(function(file) {
+            return path.join(dataDirectory, file);
+        });
+              
+        
+        var datas = [];
+        _.each(files, function(filename) {
+            // If it doesn't exist, then error out
+            if (!path.existsSync(filename)) {
+                console.error("Coverage data file does not exist: " + filename);   
+                process.exit(1);
+            }
+            
+            // Read the file, and decompress it
+            var compressedData = fs.readFileSync(filename);
+            var data = compression.uncompress(new Buffer(compressedData, "utf-8"));
+            datas.push(JSON.parse(data));
+            
+            fs.unlinkSync(filename);
+        });
+        
+        var coverageData = cover.load(datas);
         return coverageData;
     };
     
@@ -470,6 +557,15 @@
         (reporterHandlers[reporterName] || reporterHandlers.__catch_all)(coverageData.files, config, reporter);
     }
     
+    var combine = function(configFile, ignoreFile) {        
+        var files = getOptionsAndIgnore({config: configFile, ignore: ignoreFile});
+        var config = files.config;
+        var ignore = files.ignore;
+        
+        var coverageData = loadPrecombinedCoverageData(config);
+        saveCoverageData(coverageData, config, true);
+    }
+    
     var hook = function(configFile, ignoreFile) {
         var files = getOptionsAndIgnore({config: configFile, ignore: ignoreFile});
         var config = files.config;
@@ -507,6 +603,29 @@
         });
     }
     
+    var hookAndCombine = function(configFile, ignoreFile) {
+        var files = getOptionsAndIgnore({config: configFile, ignore: ignoreFile});
+        var config = files.config;
+        var ignore = files.ignore;
+        
+        hook(configFile, ignoreFile);
+        process.on("exit", function() {
+            combine(config);
+        });
+    }
+    
+    var hookAndCombineAndReport = function(reporterName, configFile, ignoreFile) {
+        var files = getOptionsAndIgnore({config: configFile, ignore: ignoreFile});
+        var config = files.config;
+        var ignore = files.ignore;
+        
+        hook(configFile, ignoreFile);
+        process.on("exit", function() {
+            combine(config);
+            report(reporterName, null, config, ignore); 
+        });
+    }
+    
     /* ====== Command Line Parsing ====== */
     
     commander
@@ -537,6 +656,16 @@
             report(reporterName, file, config, ignore);
         });
         
+    commander.command("combine")
+        .description("Combine multiple coverage files (from multiple runs) into a single, reportable file")
+        .action(function(reporterName, file) {    
+            var configs = getOptionsAndIgnore(this);
+            var config = configs.config;
+            var ignore = configs.ignore;
+                
+            combine(config, ignore);
+        });
+        
     /* ====== Exports ====== */
     
     module.exports = {
@@ -544,7 +673,10 @@
         run: run,
         report: report,
         hook: hook,
-        hookAndReport: hookAndReport
+        hookAndReport: hookAndReport,
+        combine: combine,
+        hookAndCombine: hookAndCombine,
+        hookAndCombineAndReport: hookAndCombineAndReport
     };
 })();
 

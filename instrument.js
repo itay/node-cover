@@ -50,7 +50,7 @@ module.exports = function(src) {
     return instrumentor;
 };
 
-exports.Instrumentor = Instrumentor;
+module.exports.Instrumentor = Instrumentor;
 
 function Instrumentor(src) {
     // Setup our names
@@ -73,6 +73,23 @@ function Instrumentor(src) {
 };
 
 Instrumentor.prototype = new EventEmitter;
+
+Instrumentor.prototype.objectify = function() {
+    var obj = {};
+    obj.blockCounter = this.blockCounter;
+    obj.nodeCounter = this.nodeCounter;
+    obj.source = this.source;
+    
+    obj.nodes = {};    
+    for(var key in this.nodes) {
+        if (this.nodes.hasOwnProperty(key)) {
+            var node = this.nodes[key];
+            obj.nodes[key] = { loc: node.loc, id: node.id };
+        }
+    }
+    
+    return obj;
+}
 
 Instrumentor.prototype.filter = function(action) {
     action = action || function() {};
