@@ -56,6 +56,14 @@ e = (function() { return 6; })()
 
 f = d || (g = 3);
 
+var cond = function() {
+  return true ? a() : b();
+}
+
+cond();
+
+var g = 1;
+g++;
 
 /*c = 1;
 d = function() {

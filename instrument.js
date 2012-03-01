@@ -233,6 +233,88 @@ Instrumentor.prototype.wrap = function(tree) {
                 
                 return newNode;
             }
+            case esprima.Syntax.ReturnStatement: {
+                var newNode = {
+                    "type": "SequenceExpression",
+                    "expressions": [
+                        {
+                            "type": "CallExpression",
+                            "callee": {
+                                "type": "Identifier",
+                                "name": that.names.expression
+                            },
+                            "arguments": [
+                                {
+                                    "type": "Identifier",
+                                    "name": that.nodeCounter++
+                                }
+                            ],
+                            noCover: true
+                        }
+                    ],
+                }
+                
+                if (node.argument) {
+                    newNode.expressions.push(node.argument);
+                }
+                
+                that.nodes[that.nodeCounter - 1] = node;
+                node.id = that.nodeCounter - 1;
+                
+                node.argument = newNode
+                break;
+            }
+            case esprima.Syntax.ConditionalExpression: {
+                var newConsequentNode = {
+                    "type": "SequenceExpression",
+                    "expressions": [
+                        {
+                            "type": "CallExpression",
+                            "callee": {
+                                "type": "Identifier",
+                                "name": that.names.expression
+                            },
+                            "arguments": [
+                                {
+                                    "type": "Identifier",
+                                    "name": that.nodeCounter++
+                                }
+                            ],
+                            noCover: true
+                        },
+                        node.consequent
+                    ],
+                }
+                that.nodes[that.nodeCounter - 1] = node.consequent;
+                node.consequent.id = that.nodeCounter - 1
+                
+                var newAlternateNode = {
+                    "type": "SequenceExpression",
+                    "expressions": [
+                        {
+                            "type": "CallExpression",
+                            "callee": {
+                                "type": "Identifier",
+                                "name": that.names.expression
+                            },
+                            "arguments": [
+                                {
+                                    "type": "Identifier",
+                                    "name": that.nodeCounter++
+                                }
+                            ],
+                            noCover: true
+                        },
+                        node.alternate
+                    ],
+                }
+                that.nodes[that.nodeCounter - 1] = node.alternate;
+                node.alternate.id = that.nodeCounter - 1
+                
+                node.consequent = newConsequentNode;
+                node.alternate = newAlternateNode;
+                break;
+            }
             case esprima.Syntax.BinaryExpression:
             case esprima.Syntax.UpdateExpression:
             case esprima.Syntax.LogicalExpression:
