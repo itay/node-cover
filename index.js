@@ -88,7 +88,7 @@ var explodeNodes = function(coverageData, fileData) {
             // to the correct vlaues.
             var curLine = node.loc.start.line + j;
             var startCol = 0;
-            var endCol = fileData[curLine].length;;
+            var endCol = fileData[curLine - 1].length;
                 
             if (curLine === node.loc.start.line) {
                 startCol = node.loc.start.column;
