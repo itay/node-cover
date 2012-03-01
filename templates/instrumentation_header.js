@@ -15,10 +15,6 @@
     <%= instrumented.names.expression %> = function(i) {
         var node = nodes[i] = (nodes[i] || {index: i, count:0})
         node.count++;
-        
-        return function(expr) {
-            return expr;
-        }
     }; 
     
     <%= instrumented.names.block %> = function(i) {

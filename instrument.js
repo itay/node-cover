@@ -238,24 +238,25 @@ Instrumentor.prototype.wrap = function(tree) {
             case esprima.Syntax.LogicalExpression:
             case esprima.Syntax.CallExpression: {
                 var newNode = {
-                    "type": "CallExpression",
-                    "callee": {
-                        "type": "CallExpression",
-                        "callee": {
-                            "type": "Identifier",
-                            "name": that.names.expression
+                    "type": "SequenceExpression",
+                    "expressions": [
+                        {
+                            "type": "CallExpression",
+                            "callee": {
+                                "type": "Identifier",
+                                "name": that.names.expression
+                            },
+                            "arguments": [
+                                {
+                                    "type": "Identifier",
+                                    "name": that.nodeCounter++
+                                }
+                            ]
                         },
-                        "arguments": [
-                            {
-                                "type": "Literal",
-                                "value": that.nodeCounter++
-                            }
-                        ]
-                    },
-                    "arguments": [
                         node
                     ]
                 }
+                
                 that.nodes[that.nodeCounter - 1] = node;
                 node.id = that.nodeCounter - 1;
                 
