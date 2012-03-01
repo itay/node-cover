@@ -5,6 +5,8 @@
     "prefix": "coveragefile_",              // Prefix for coverage data files
     "dataDirectory": ".coverage_data",      // Directory to put coverage files in
     
+    "debugDirectory": ".coverage_debug",    // Directory to put instrumented files in
+    
     // Formatter-specific info
     "html" : {
         "directory": "cover_html",          // Directory to write HTML files too

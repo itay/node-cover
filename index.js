@@ -339,7 +339,7 @@ var load = function(datas) {
     return combinedCoverage;
 }
 
-var cover = function(fileRegex, ignore) {    
+var cover = function(fileRegex, ignore, debugDirectory) {    
     var originalRequire = require.extensions['.js'];
     var coverageData = {};
     var match = null;
@@ -382,6 +382,11 @@ var cover = function(fileRegex, ignore) {
         var coverage = coverageData[filename] = new CoverageData(filename, instrumented);
         
         var newCode = addInstrumentationHeader(template, filename, instrumented, pathToCoverageStore);
+        
+        if (debugDirectory) {
+            var outputPath = path.join(debugDirectory, filename.replace(/\//g, "_") + ".js");
+            fs.writeFileSync(outputPath, newCode);
+        }
         
         return module._compile(newCode, filename);
     };

@@ -159,11 +159,11 @@
     
     /* ====== Context and Execution Handling ====== */
     
-    // Run a file with coverage enabled in a new context
-    var runFile = function(file, options, ignore) {
+    // Run a file with coverage enabled
+    var runFile = function(file, options, ignore, debug) {
         var file = path.resolve(file);
         
-        var coverage = cover.cover(null, ignore);
+        var coverage = cover.cover(null, ignore, debug);
         
         process.nextTick(function() {
             try {
@@ -513,9 +513,16 @@
     
     /* ====== Commands ====== */
     
-    var run = function(file, cmdline, config, ignore) {            
+    var run = function(file, cmdline, config, ignore, debug) {            
+        if (debug) {
+            var debugDirectory = config.debugDirectory;
+            if (!path.existsSync(debugDirectory)) {
+                fs.mkdirSync(debugDirectory, "0755");
+            }
+        }
+        
         // Run the file
-        var coverage = runFile(file, cmdline, ignore);
+        var coverage = runFile(file, cmdline, ignore, debug ? config.debugDirectory : null);
         
         // Setup the on exit listener
         process.on(
@@ -635,15 +642,17 @@
         
     commander.command("run <file>")
         .description("Run a file and collect code coverage information for it")
-        .action(function(file) {       
+        .option("-d, --debug", "Enable debugging")
+        .action(function(file, options) {
             var configs = getOptionsAndIgnore(this);
             var config = configs.config;
             var ignore = configs.ignore;
+            var debug = options.debug;
         
             // Remove the command itself
             var cmdline = this.args.slice(1);
             
-            run(file, cmdline, config, ignore);
+            run(file, cmdline, config, ignore, debug);
         });
         
     commander.command("report [reporter] [file]")

@@ -4,3 +4,4 @@ node_modules/*
 .coverignore
 npm-debug.log
 cover_html/*
+.coverage_debug/*
