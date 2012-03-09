@@ -122,7 +122,7 @@ var explodeNodes = function(coverageData, fileData) {
 // Get per-line code coverage information
 CoverageData.prototype.coverage = function() {  
     var missingLines = this.missing();
-    var fileData = fs.readFileSync(this.filename, 'utf8').split('\n');
+    var fileData = this.instrumentor.source.split('\n');
     
     // Get a dictionary of all the lines we did observe being at least
     // partially covered
@@ -375,7 +375,7 @@ var cover = function(fileRegex, ignore, debugDirectory) {
           }
         } while(full !== path.dirname(full));
         
-        var data = stripBOM(fs.readFileSync(filename, 'utf8'));
+        var data = stripBOM(fs.readFileSync(filename, 'utf8').trim());
         data = data.replace(/^\#\!.*/, '');
         
         var instrumented = instrument(data);
