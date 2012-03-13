@@ -17,6 +17,7 @@
     var compression   = require('compress-buffer');
     var commander     = require('../contrib/commander');
     var Table         = require('../contrib/cli-table');
+    var pkg           = require('../package.json');
     
     var patch_console = require('../utils/console');
     var cover         = require("../index.js");
@@ -191,7 +192,7 @@
         // Setup the information we're going to save
         var files = {};
         var toSave = {
-            version: "0.2.2",
+            version: pkg.version,
             files: files
         };
         
@@ -636,7 +637,7 @@
     /* ====== Command Line Parsing ====== */
     
     commander
-        .version("0.0.1")
+        .version(pkg.version)
         .option("-c, --config <config>", "Path to a .coverrc file")
         .option("-i, --ignore <ignore>", "Path to a .coverignore file")
         
