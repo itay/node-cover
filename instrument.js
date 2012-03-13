@@ -1,5 +1,6 @@
 var fs           = require('fs');
 var esprima      = require('./contrib/esprima');
+var escodegen    = require('./contrib/escodegen');
 var EventEmitter = require('events').EventEmitter;
 
 esprima.Syntax = {
@@ -113,7 +114,7 @@ Instrumentor.prototype.instrument = function(code) {
     var tree = esprima.parse(code, {range: true, loc: true});
     this.wrap(tree);
     
-    return esprima.generate(tree);
+    return escodegen.generate(tree);
 };
 
 Instrumentor.prototype.addToContext = function(context) {
