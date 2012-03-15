@@ -180,6 +180,7 @@ Instrumentor.prototype.traverseAndWrap = function(object, visitor, master) {
             
             if (newNode) {
                 object[key] = newNode;
+                newNode = null;
             }
         }
     }
@@ -189,8 +190,7 @@ Instrumentor.prototype.traverseAndWrap = function(object, visitor, master) {
 
 Instrumentor.prototype.wrap = function(tree) {    
     var that = this;
-    this.traverseAndWrap(tree, function(node, path) {
-      
+    this.traverseAndWrap(tree, function(node, path) {      
         if (node.noCover) {
             return;
         }
