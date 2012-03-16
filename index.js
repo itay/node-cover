@@ -269,13 +269,14 @@ var cli = function() {
 
 var addInstrumentationHeader = function(template, filename, instrumented, coverageStorePath) {
     var template = _.template(template);
-    var header = template({
+    var renderedSource = template({
         instrumented: instrumented,
         coverageStorePath: coverageStorePath,
-        filename: filename
+        filename: filename,
+        source: instrumented.instrumentedSource
     });
     
-    return header + instrumented.instrumentedSource;
+    return renderedSource
 };
 
 var stripBOM = function(content) {

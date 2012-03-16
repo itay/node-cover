@@ -25,4 +25,4 @@
 ////////////////////////
 
 // Instrumented Code
-
+<%= source %>
