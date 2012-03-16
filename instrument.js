@@ -111,8 +111,47 @@ Instrumentor.prototype.filter = function(action) {
 Instrumentor.prototype.instrument = function(code) {
     this.source = code;
     
-    var tree = esprima.parse(code, {range: true, loc: true});
-    this.wrap(tree);
+    // We wrap the code with a function to make sure it is compliant with node
+    var header = "(function() {";
+    var footer = "\n})();"
+    var wrappedCode = header + code + footer;
+    
+    // Parse the wrapped code
+    var tree = esprima.parse(wrappedCode, {range: true, loc: true});
+    
+    // We only "instrument" the original part, which is in this sub-statement
+    this.wrap(tree.body[0].expression.callee.body.body);    
+    
+    // We need to adjust the nodes for everything on the first line,
+    // such that their location statements will start at 1 and not at header.length
+    for(var nodeKey in this.nodes) {
+        if (this.nodes.hasOwnProperty(nodeKey)) {
+            var node = this.nodes[nodeKey];
+            
+            if (node.loc.start.line === 1 || node.loc.end.line === 1) {
+                // Copy over the location data, as these are shared across
+                // nodes. We only do it for things on the first line
+                node.loc = {
+                    start: {
+                        line: node.loc.start.line,
+                        column: node.loc.start.column
+                    },
+                    end: {
+                        line: node.loc.end.line,
+                        column: node.loc.end.column
+                    }
+                }   
+                
+                // Adjust the columns
+                if (node.loc.start.line == 1) {
+                    node.loc.start.column = node.loc.start.column - header.length;
+                }
+                if (node.loc.end.line == 1) {
+                    node.loc.end.column = node.loc.end.column - header.length;
+                }
+            }
+        }
+    }
     
     return escodegen.generate(tree);
 };
@@ -190,7 +229,7 @@ Instrumentor.prototype.traverseAndWrap = function(object, visitor, master) {
 
 Instrumentor.prototype.wrap = function(tree) {    
     var that = this;
-    this.traverseAndWrap(tree, function(node, path) {      
+    this.traverseAndWrap(tree, function(node, path) {           
         if (node.noCover) {
             return;
         }
