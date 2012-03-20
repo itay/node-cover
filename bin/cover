@@ -23,6 +23,9 @@
     var patch_console = require('../utils/console');
     var cover         = require("../index.js");
     
+    // Store the initial CWD, to harden us against process.chdir
+    var CWD = path.resolve(process.cwd());
+    
     // Get a list of the built-in reporters
     var reporterOptions = "[" + _.keys(cover.reporters).join(",") + "]";
     
@@ -64,7 +67,7 @@
         var ignore = {};
         
         // Get the full path relative to the CWD
-        var fullIgnorePath = path.resolve(process.cwd(), ignorePath);
+        var fullIgnorePath = path.resolve(CWD, ignorePath);
         if (path.existsSync(fullIgnorePath)) {
             // If we found an ignore file, read it in
             var ignoreContents = fs.readFileSync(fullIgnorePath, "utf-8");
@@ -96,7 +99,7 @@
         var config = {}
         
         // Get the full path relative to the CWD
-        configFile = path.resolve(process.cwd(), configFile);
+        configFile = path.resolve(CWD, configFile);
         if (!path.existsSync(configFile)) {
             configFile = defaultConfigPath;
         }
@@ -238,7 +241,7 @@
         var compressedData = compression.compress(new Buffer(data, "utf-8"));
         
         // Make the directory
-        var dataDirectory = configs.dataDirectory;
+        var dataDirectory = path.join(CWD, configs.dataDirectory);
         if (!path.existsSync(dataDirectory)) {
             fs.mkdirSync(dataDirectory, "0755");
         }
@@ -291,7 +294,7 @@
         var compressedData = compression.compress(new Buffer(data, "utf-8"));
         
         // Make the directory
-        var dataDirectory = configs.dataDirectory;
+        var dataDirectory = path.join(CWD, configs.dataDirectory);
         if (!path.existsSync(dataDirectory)) {
             fs.mkdirSync(dataDirectory, "0755");
         }
@@ -396,7 +399,7 @@
             var allStats = [];
             var statsByFile = {};
             
-            var htmlDirectory = config.html.directory;
+            var htmlDirectory = path.join(CWD, config.html.directory);
             var templateDir = path.resolve(__dirname, "..", "templates");
             var resourceDir = path.resolve(__dirname, "..", "resources");
             
@@ -424,7 +427,7 @@
                 };
                 
                 allStats.push([
-                    path.relative(process.cwd(), filename), 
+                    path.relative(CWD, filename), 
                     Math.floor(stats.percentage * 100) + "%", 
                     stats.missing, 
                     stats.total,
@@ -462,7 +465,7 @@
             var headers = ["Filename", "% Covered", "Missed Lines", "# Lines", "% Blocks", "Missed Blocks", "# Blocks"];
             var fileUrls = {};
             _.each(files, function(file) {
-                fileUrls[path.relative(process.cwd(), file)] =  file.replace(/\//g, "_") + ".html";
+                fileUrls[path.relative(CWD, file)] =  file.replace(/\//g, "_") + ".html";
             });
             
             var indexHtml = indexTemplate({ headers: headers, data: allStats, fileUrls: fileUrls });
@@ -528,7 +531,7 @@
     
     var run = function(file, cmdline, config, ignore, debug) {            
         if (debug) {
-            var debugDirectory = config.debugDirectory;
+            var debugDirectory = path.join(CWD, config.debugDirectory);
             if (!path.existsSync(debugDirectory)) {
                 fs.mkdirSync(debugDirectory, "0755");
             }
