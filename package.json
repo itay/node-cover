@@ -1,6 +1,6 @@
 {
     "name" : "cover",
-    "version" : "0.2.4",
+    "version" : "0.2.5",
     "description" : "Native JavaScript code coverage",
     "main" : "index.js",
     "directories" : {
@@ -12,7 +12,8 @@
         "cli-table": "0.0.x",
         "underscore": "1.2.x",
         "underscore.string": "2.0.x",
-        "compress-buffer": "0.5.x"
+        "compress-buffer": "0.5.x",
+        "which": "1.0.x"
     },
     "repository" : {
         "type" : "git",

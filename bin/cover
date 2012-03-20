@@ -15,6 +15,7 @@
     var _             = require('underscore');
     var _s            = require('underscore.string');
     var compression   = require('compress-buffer');
+    var which         = require('which').sync;
     var commander     = require('../contrib/commander');
     var Table         = require('../contrib/cli-table');
     var pkg           = require('../package.json');
@@ -162,7 +163,18 @@
     
     // Run a file with coverage enabled
     var runFile = function(file, options, ignore, debug) {
-        var file = path.resolve(file);
+        if (!path.existsSync(file)) {
+            try {
+                file = which(file);
+            }
+            catch(ex) {
+                console.log("Could not find file: '" + file + "' -- exiting...");
+                return null;
+            }
+        }
+        else {
+            file = path.resolve(file);
+        }
         
         var coverage = cover.cover(null, ignore, debug);
         
@@ -531,6 +543,11 @@
             function() {
                 // For debugging purposes, make sure we can print things
                 patch_console.patch();
+                
+                if (!coverage) {
+                    return;
+                }
+                
                 coverage(function(coverageData) {
                     try {
                         saveCoverageData(coverageData, config);
