@@ -14,7 +14,6 @@
     var Module        = require('module').Module;   
     var _             = require('underscore');
     var _s            = require('underscore.string');
-    var compression   = require('compress-buffer');
     var which         = require('which').sync;
     var commander     = require('../contrib/commander');
     var Table         = require('../contrib/cli-table');
@@ -229,16 +228,13 @@
             }
         });
         
-        // Turn it into JSON, compress it, and write it out
+        // Turn it into JSON and write it out
         var data = JSON.stringify(toSave);
         
         // Get the ID for this data (md5 hash)
         var dataMd5 = crypto.createHash('md5');
         dataMd5.update(data);
         var dataHash = dataMd5.digest('hex');
-        
-        // Compress the data
-        var compressedData = compression.compress(new Buffer(data, "utf-8"));
         
         // Make the directory
         var dataDirectory = path.join(CWD, configs.dataDirectory);
@@ -248,7 +244,7 @@
         
         // Write out the file
         var dataFilename = path.join(dataDirectory, configs.prefix + dataHash);
-        fs.writeFileSync(dataFilename, compressedData);
+        fs.writeFileSync(dataFilename, data);
     };
     
     var savePrecombinedCoverageData = function(coverageData, configs) {
@@ -282,16 +278,13 @@
             }
         });
         
-        // Turn it into JSON, compress it, and write it out
+        // Turn it into JSON and write it out
         var data = JSON.stringify(toSave);
         
         // Get the ID for this data (md5 hash)
         var dataMd5 = crypto.createHash('md5');
         dataMd5.update(data);
         var dataHash = dataMd5.digest('hex');
-        
-        // Compress the data
-        var compressedData = compression.compress(new Buffer(data, "utf-8"));
         
         // Make the directory
         var dataDirectory = path.join(CWD, configs.dataDirectory);
@@ -301,7 +294,7 @@
         
         // Write out the file
         var dataFilename = path.join(dataDirectory, "precombined_" + configs.prefix + dataHash);
-        fs.writeFileSync(dataFilename, compressedData);
+        fs.writeFileSync(dataFilename, data);
     };
     
     var loadCoverageData = function(filename, configs) {
@@ -343,9 +336,8 @@
             process.exit(1);
         }
         
-        // Read the file, and decompress it
-        var compressedData = fs.readFileSync(filename);
-        var data = compression.uncompress(new Buffer(compressedData, "utf-8"));
+        // Read the file
+        var data = fs.readFileSync(filename, "utf-8");
         var coverageData = JSON.parse(data);
         
         // Remake the objects into what the reporters expect
@@ -379,9 +371,8 @@
                 process.exit(1);
             }
             
-            // Read the file, and decompress it
-            var compressedData = fs.readFileSync(filename);
-            var data = compression.uncompress(new Buffer(compressedData, "utf-8"));
+            // Read the file
+            var data = fs.readFileSync(filename, "utf-8");
             datas.push(JSON.parse(data));
             
             fs.unlinkSync(filename);
