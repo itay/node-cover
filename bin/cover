@@ -697,10 +697,26 @@
             combine(config, ignore);
         });
         
+    var printHelp = function() {
+        console.log(commander.helpInformation());
+    }
+        
+    commander.command("*")
+        .action(function() {
+            printHelp();
+        });
+        
     /* ====== Exports ====== */
     
     module.exports = {
-        parse: function(argv) { return commander.parse(argv); },
+        parse: function(argv) { 
+            var cmdline = commander.parse(argv); 
+            if (!cmdline.executedCommand) {
+                printHelp();
+            }
+            
+            return cmdline;
+        },
         run: run,
         report: report,
         hook: hook,
