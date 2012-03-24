@@ -1,6 +1,6 @@
 {
     "name" : "cover",
-    "version" : "0.2.5",
+    "version" : "0.2.6",
     "description" : "Native JavaScript code coverage",
     "main" : "index.js",
     "directories" : {
