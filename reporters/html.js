@@ -53,9 +53,20 @@ module.exports = {
             fileOutput.push(lineOutput.join(""));
         }
       
-        finalOutput.push("<pre class='prettyprint lang-js linenums'>");
+        var lineOutput = [];
+        for(var i = 0; i < source.length; i++) {
+            var lineNum = i + 1;
+            lineOutput.push("<p>" + lineNum + "</p>");
+        }
+      
+        finalOutput.push("<td class='linenos' valign='top'>");
+        finalOutput.push(lineOutput.join(""));
+        finalOutput.push("</td>");
+        finalOutput.push("<td class='text' valign='top'>");
+        finalOutput.push("<pre class='prettyprint lang-js'>");
         finalOutput.push(fileOutput.join("\n"));
         finalOutput.push("</pre>");
+        finalOutput.push("</td>");
 
         var outputString = finalOutput.join("\n");
 

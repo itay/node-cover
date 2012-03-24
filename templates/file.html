@@ -36,47 +36,32 @@
       table#files-table td:first-child, table#files-table th:first-child {
         width: 33%;
       }
-        
-      li.L0,li.L1,li.L2,li.L3,li.L4, li.L5,li.L6,li.L7,li.L8, li.L9 { background: transparent; }
-      li.L1,li.L3,li.L5,li.L7,li.L9 { background: white; }
-       
-      li.covered {
-        border-left: 2px solid lime; 
-      }
-      
-      li.uncovered {
-        background: #FDD;
-        border-left: 2px solid red; 
-      }
-      
-      li.partial {
-        border-left: 2px solid #EE9; 
-        background: #FFA;
-      }
       
       .partialuncovered { 
         background: #EE9; 
       }
       
-      ol.linenums { 
-        font-size: 10px;
-      }
-      
-      ol.linenums li  {
-        line-height: 16px;
-      }
-      
-      ol.linenums li span {
-        font-size: 12px;
-      }
-      
       pre.prettyprint {
-        padding-top: 1em;
+        padding-top: 0em;
         border: 5px;
-        padding-left: 1.5em;
-        padding-bottom: 2em;
+        padding-left: 0em;
+        padding-bottom: 0em;
         font-family: Consolas, Menlo, Monaco, 'Lucida Console', 'Liberation Mono', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Courier New', monospace, serif;
 
+      }
+       
+      span.covered {
+        border-left: 2px solid lime; 
+      }
+      
+      span.uncovered {
+        background: #FDD;
+        border-left: 2px solid red; 
+      }
+      
+      span.partial {
+        border-left: 2px solid #EE9; 
+        background: #FFA;
       }
       
       div.header {
@@ -134,17 +119,41 @@
         color: gray;
       }
       
-    </style>
+      table.code td.text {
+        padding-left: 0px;
+        padding-right: 0px;
+      }
 
+      .linenos p {
+        text-align: left;
+        margin: 0;
+        padding-right: 0.5em;
+        color: #999999;
+        font-family: verdana, sans-serif;
+        font-size: 0.8em;   /* 12/16 */
+        line-height: 16px;  /* 16/12 */
+      }
+
+      td.text {
+        width: 100%;
+        height: 16px;
+      }
+      
+      td.text pre > span {
+        padding-top: 3px;
+        line-height: 16px;
+      }
+    
+    </style>
     <script src="jquery.min.js"></script>
     <script type="text/javascript" src="prettify.js"></script>
     <script >
+    
       $(function() {
-        prettyPrint();
-        
-        $("li span.covered").parent().addClass("covered");
-        $("li span.uncovered").parent().addClass("uncovered");
-        $("li span.partial").parent().addClass("partial");
+        $(".linenos p").css("text-align", "right");
+        setTimeout(function() {
+          prettyPrint();
+        });
       });
     </script>
 
@@ -173,7 +182,13 @@
             </div>
           </div>
         </div>
-        <%= code %>
+        <table class="code" cellspacing="0" cellpadding="0">
+          <tbody>
+            <tr>
+              <%= code %>          
+            </tr>
+          </tbody>
+        </table>
         <a class="index" href="index.html">« index</a> | <a class="coverio" href="http://cover.io">cover.io</a>
       </div>
   </body>

@@ -450,13 +450,13 @@
                 
                 var htmlTemplateString = fs.readFileSync(path.join(templateDir, "file.html")).toString("utf-8");
                 var htmlTemplate = _.template(htmlTemplateString); 
-                var html = htmlTemplate({ 
+                var completeHtml = htmlTemplate({ 
                     filename: filename, 
                     code: html,
-                    stats: statsByFile[filename]     
+                    stats: statsByFile[filename]
                 }); 
                     
-                fs.writeFileSync(outputPath, html);
+                fs.writeFileSync(outputPath, completeHtml);
             });
 
             // Compile the index file with the template, and write it out to disk
