@@ -7,6 +7,8 @@
     
     "debugDirectory": ".coverage_debug",    // Directory to put instrumented files in
     
+    "modules": false,                       // Whether or not to cover node_modules directory
+    
     // Formatter-specific info
     "html" : {
         "directory": "cover_html",          // Directory to write HTML files too

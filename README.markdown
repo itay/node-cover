@@ -57,21 +57,25 @@ Cover reads from a `.coverrc` file in your project directory, and it comes
 with sensible defaults. Here are the defaults that it uses:
 
     {
-       "formatter": "cli",
-       "ignore": ".coverignore",
-       
-       "prefix": "coveragefile_",              // Prefix for coverage data files
-       "dataDirectory": ".coverage_data",      // Directory to put coverage files in
-       
-       // Formatter-specific info
-       "html" : {
-           "directory": "cover_html",          // Directory to write HTML files too
-           "generateIndex": true               // Whether to generate an index.html file
-       },
-       
-       "json": {
-       }
-   }
+        "formatter": "cli",
+        "ignore": ".coverignore",
+        
+        "prefix": "coveragefile_",              // Prefix for coverage data files
+        "dataDirectory": ".coverage_data",      // Directory to put coverage files in
+        
+        "debugDirectory": ".coverage_debug",    // Directory to put instrumented files in
+        
+        "modules": false,                       // Whether or not to cover node_modules directory
+        
+        // Formatter-specific info
+        "html" : {
+            "directory": "cover_html",          // Directory to write HTML files too
+            "generateIndex": true               // Whether to generate an index.html file
+        },
+        
+        "json": {
+        }
+    }
     
 You can also specify which files to ignore using .coverignore. Here is the one used
 for Cover itself:

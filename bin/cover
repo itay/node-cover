@@ -62,7 +62,7 @@
         return str;
     };
     
-    var readIgnoreFile = function(ignorePath) {
+    var readIgnoreFile = function(ignorePath, ignoreModules) {
         var ignore = {};
         
         // Get the full path relative to the CWD
@@ -72,7 +72,7 @@
             var ignoreContents = fs.readFileSync(fullIgnorePath, "utf-8");
             try {
                 // Note that directory fo the ignore path
-                var dir = path.dirname(path.resolve(ignorePath));
+                var dir = path.dirname(fullIgnorePath);
                 var ignores = ignoreContents.split("\n");
                 
                 // For each line (ignoring blank ones), get the full path,
@@ -130,7 +130,9 @@
         return config;
     };
     
-    var getOptionsAndIgnore = function(cmdline) {
+    var getOptionsAndIgnore = function(cmdline, options) {
+        options = options || {};
+        
         // Get configuration
         var config = {};
         if (cmdline.config || ".coverrc") {
@@ -151,6 +153,13 @@
             else {
                 ignore = readIgnoreFile(cmdline.ignore || config.ignore || ".coverignore");
             }
+        }
+        
+        // If we didn't override it on the command line and the
+        // coverrc file says to ingore node_modules, then ignore
+        // it
+        if (options.modules !== true && config.modules === false) {
+            ignore[path.resolve(CWD, "node_modules")] = true;
         }
         
         return {
@@ -655,8 +664,9 @@
     commander.command("run <file>")
         .description("Run a file and collect code coverage information for it")
         .option("-d, --debug", "Enable debugging")
+        .option("-m, --modules", "Enable coverage for node_modules")
         .action(function(file, options) {
-            var configs = getOptionsAndIgnore(this);
+            var configs = getOptionsAndIgnore(this, options);
             var config = configs.config;
             var ignore = configs.ignore;
             var debug = options.debug;
