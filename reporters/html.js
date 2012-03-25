@@ -64,11 +64,11 @@ module.exports = {
         finalOutput.push("</td>");
         finalOutput.push("<td class='text' valign='top'>");
         finalOutput.push("<pre class='prettyprint lang-js'>");
-        finalOutput.push(fileOutput.join("\n"));
+        finalOutput.push(fileOutput.join(""));
         finalOutput.push("</pre>");
         finalOutput.push("</td>");
 
-        var outputString = finalOutput.join("\n");
+        var outputString = finalOutput.join("");
 
         return outputString;
     }

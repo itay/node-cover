@@ -354,11 +354,14 @@ var cover = function(fileRegex, ignore, debugDirectory) {
         match = new RegExp(fileRegex ? (fileRegex.replace(/\//g, '\\/').replace(/\./g, '\\.')) : ".*", '');
     }
         
-    var pathToCoverageStore = path.resolve(path.resolve(__dirname), "coverage_store.js");
+    var pathToCoverageStore = path.resolve(path.resolve(__dirname), "coverage_store.js").replace(/\\/g, "/");
     var templatePath = path.resolve(path.resolve(__dirname), "templates", "instrumentation_header.js");
     var template = fs.readFileSync(templatePath, 'utf-8');
     
     require.extensions['.js'] = function(module, filename) {
+        
+        filename = filename.replace(/\\/g, "/");
+
         if(!match.test(filename)) return originalRequire(module, filename);
         if(filename === pathToCoverageStore) return originalRequire(module, filename);
         
@@ -375,7 +378,7 @@ var cover = function(fileRegex, ignore, debugDirectory) {
             return originalRequire(module, filename);
           }
         } while(full !== path.dirname(full));
-        
+
         var data = stripBOM(fs.readFileSync(filename, 'utf8').trim());
         data = data.replace(/^\#\!.*/, '');
         
@@ -385,7 +388,7 @@ var cover = function(fileRegex, ignore, debugDirectory) {
         var newCode = addInstrumentationHeader(template, filename, instrumented, pathToCoverageStore);
         
         if (debugDirectory) {
-            var outputPath = path.join(debugDirectory, filename.replace(/\//g, "_") + ".js");
+            var outputPath = path.join(debugDirectory, filename.replace(/[\/|\:|\\]/g, "_") + ".js");
             fs.writeFileSync(outputPath, newCode);
         }
         
