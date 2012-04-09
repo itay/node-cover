@@ -1,6 +1,14 @@
 var fs = require('fs');
 var _ = require('underscore');
 
+function htmlEscape(string) {
+    return string.replace(/&/g, "&amp;")
+                 .replace(/</g, "&lt;")
+                 .replace(/>/g, "&gt;")
+                 .replace(/"/g, "&quot;")
+                 .replace(/'/g, "&#39;");
+}
+
 module.exports = {
     name: "html",
     format: function(coverageData) {
@@ -15,7 +23,7 @@ module.exports = {
             var lineOutput = [];
             if (!stats.coverage.hasOwnProperty(line + 1)) {
                 lineOutput.push("<span class='covered'>  ");
-                lineOutput.push(sourceLine);
+                lineOutput.push(htmlEscape(sourceLine));
                 lineOutput.push("</span>");
             }
             else {
@@ -25,7 +33,7 @@ module.exports = {
                 if (!lineInfo.partial) {
                     // If it isn't partial, then we can just append the entire line
                     lineOutput.push("<span class='uncovered'>  ");
-                    lineOutput.push(sourceLine.replace(/</g, "&lt;"));
+                    lineOutput.push(htmlEscape(sourceLine));
                     lineOutput.push("</span>");
                 }
                 else {
@@ -35,17 +43,17 @@ module.exports = {
                         curStart = j == 0 ? 0 : (lineInfo.missing[j-1].endCol + 1);
                         curEnd = lineInfo.missing[j].startCol;
                         
-                        lineOutput.push(sourceLine.slice(curStart, curEnd).replace(/</g, "&lt;"));
+                        lineOutput.push(htmlEscape(sourceLine.slice(curStart, curEnd)));
                         
                         lineOutput.push("<span class='partialuncovered'>");
-                        lineOutput.push(sourceLine.slice(lineInfo.missing[j].startCol, lineInfo.missing[j].endCol + 1).replace(/</g, "&lt;"));
+                        lineOutput.push(htmlEscape(sourceLine.slice(lineInfo.missing[j].startCol, lineInfo.missing[j].endCol + 1)));
                         lineOutput.push("</span>");
                     }
                     
                     // Add the straggling part
                     curStart = lineInfo.missing[lineInfo.missing.length - 1].endCol + 1;
                     curEnd = sourceLine.length;
-                    lineOutput.push(sourceLine.slice(curStart, curEnd).replace(/</g, "&lt;"));
+                    lineOutput.push(htmlEscape(sourceLine.slice(curStart, curEnd)));
                     
                     lineOutput.push("</span>");
                 }
