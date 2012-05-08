@@ -358,7 +358,24 @@ Instrumentor.prototype.wrap = function(tree) {
             case esprima.Syntax.BinaryExpression:
             case esprima.Syntax.UpdateExpression:
             case esprima.Syntax.LogicalExpression:
-            case esprima.Syntax.CallExpression: {
+            case esprima.Syntax.CallExpression:
+            case esprima.Syntax.UnaryExpression:
+            case esprima.Syntax.Identifier: {
+                // Only instrument Identifier in certain context.
+                if (node.type === esprima.Syntax.Identifier) {
+                    if (!(parent && (parent.type == 'UnaryExpression' ||
+                          parent.type == 'BinaryExpression' ||
+                          parent.type == 'LogicalExpression' ||
+                          parent.type == 'ConditionalExpression' ||
+                          parent.type == 'SwitchStatement' ||
+                          parent.type == 'SwitchCase' ||
+                          parent.type == 'ForStatement' ||
+                          parent.type == 'IfStatement' ||
+                          parent.type == 'WhileStatement' ||
+                          parent.type == 'DoWhileStatement'))) {
+                        return;
+                    }
+                }
                 var newNode = {
                     "type": "SequenceExpression",
                     "expressions": [
