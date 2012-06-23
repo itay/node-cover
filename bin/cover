@@ -446,12 +446,12 @@
             // For each HTML file, use the template to generate an HTML file,
             // and write it out to disk
             _.each(htmls, function(html, filename) {
-                var outputPath = path.join(htmlDirectory, filename.replace(/[\/|\:|\\]/g, "_") + ".html");
+                var outputPath = path.join(htmlDirectory, path.relative(CWD, filename).replace(/[\/|\:|\\]/g, "_") + ".html");
                 
                 var htmlTemplateString = fs.readFileSync(path.join(templateDir, "file.html")).toString("utf-8");
                 var htmlTemplate = _.template(htmlTemplateString); 
                 var completeHtml = htmlTemplate({ 
-                    filename: filename, 
+                    filename: path.relative(CWD, filename),
                     code: html,
                     stats: statsByFile[filename]
                 }); 
@@ -465,7 +465,7 @@
             var headers = ["Filename", "% Covered", "Missed Lines", "# Lines", "% Blocks", "Missed Blocks", "# Blocks"];
             var fileUrls = {};
             _.each(files, function(file) {
-                fileUrls[path.relative(CWD, file)] =  file.replace(/[\/|\:|\\]/g, "_") + ".html";
+                fileUrls[path.relative(CWD, file)] = path.relative(CWD, file).replace(/[\/|\:|\\]/g, "_") + ".html";
             });
             
             var indexHtml = indexTemplate({ headers: headers, data: allStats, fileUrls: fileUrls });
