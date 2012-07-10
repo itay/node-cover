@@ -519,6 +519,8 @@
                 table.push(cover.reporters.cli.format(fileData[filename]));
             }
 
+            table.push(cover.reporters.cli.format(coverageData.overall));
+
             console.log(table.toString());
         },
 
