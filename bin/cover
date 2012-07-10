@@ -414,7 +414,8 @@
 
     var reporterHandlers = {
         html: function(coverageData, config) {
-            var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+            fileData = coverageData.files;
+            var files = _.sortBy(_.keys(fileData), function(file) { return file; });
             var allStats = [];
             var statsByFile = {};
 
@@ -425,13 +426,13 @@
             var htmls = {};
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
-                htmls[filename] = cover.reporters.html.format(coverageData[filename]);
+                htmls[filename] = cover.reporters.html.format(fileData[filename]);
             }
 
             // For each file, we compile a list of its summmary stats
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
-                var stats = coverageData[filename].stats();
+                var stats = fileData[filename].stats();
 
                 statsByFile[filename] = {
                     percentage: Math.floor(stats.percentage * 100) + "%",
@@ -500,7 +501,8 @@
         },
 
         cli: function(coverageData, config) {
-            var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+            fileData = coverageData.files;
+            var files = _.sortBy(_.keys(fileData), function(file) { return file; });
 
             var table = new Table({
                 head: ["Filename", "% Covered", "Missed Lines", "# Lines", "% Blocks", "Missed Blocks", "# Blocks"],
@@ -514,28 +516,30 @@
 
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
-                table.push(cover.reporters.cli.format(coverageData[filename]));
+                table.push(cover.reporters.cli.format(fileData[filename]));
             }
 
             console.log(table.toString());
         },
 
         plain: function(coverageData, config) {
-            var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+            fileData = coverageData.files;
+            var files = _.sortBy(_.keys(fileData), function(file) { return file; });
 
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
-                console.log(cover.reporters.plain.format(coverageData[filename]));
+                console.log(cover.reporters.plain.format(fileData[filename]));
             }
         },
 
         json: function(coverageData, config) {
-            var files = _.sortBy(_.keys(coverageData), function(file) { return file; });
+            fileData = coverageData.files;
+            var files = _.sortBy(_.keys(fileData), function(file) { return file; });
 
             var jsons = [];
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
-                jsons.push(cover.reporters.json.format(coverageData[filename]));
+                jsons.push(cover.reporters.json.format(fileData[filename]));
             }
 
             console.log(JSON.stringify(jsons));
@@ -601,7 +605,7 @@
             }
         }
 
-        (reporterHandlers[reporterName] || reporterHandlers.__catch_all)(coverageData.files, config, reporter);
+        (reporterHandlers[reporterName] || reporterHandlers.__catch_all)(coverageData, config, reporter);
     }
 
     var combine = function(configFile, ignoreFile) {
