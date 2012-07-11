@@ -550,6 +550,8 @@
                 jsons.push(cover.reporters.json.format(fileData[filename]));
             }
 
+            jsons.push(cover.reporters.json.format(coverageData.overall));
+
             console.log(JSON.stringify(jsons));
         },
 
