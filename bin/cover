@@ -423,6 +423,18 @@
             var templateDir = path.resolve(__dirname, "..", "templates");
             var resourceDir = path.resolve(__dirname, "..", "resources");
 
+            function statsRow(name, stats) {
+              return [
+                  name,
+                  Math.floor(stats.percentage * 100) + "%",
+                  stats.missing,
+                  stats.total,
+                  Math.floor(stats.blocks.percentage * 100) + "%",
+                  stats.blocks.missing,
+                  stats.blocks.total
+              ];
+            }
+
             var htmls = {};
             for(var i = 0; i < files.length; i++) {
                 var filename = files[i];
@@ -446,16 +458,10 @@
                     totalBlocks: stats.blocks.total,
                 };
 
-                allStats.push([
-                    path.relative(CWD, filename),
-                    Math.floor(stats.percentage * 100) + "%",
-                    stats.missing,
-                    stats.total,
-                    Math.floor(stats.blocks.percentage * 100) + "%",
-                    stats.blocks.missing,
-                    stats.blocks.total
-                ]);
+                allStats.push(statsRow(path.relative(CWD, filename), stats));
             }
+
+            allStats.push(statsRow('Overall', coverageData.overall.stats()));
 
             // Delete the HTML directory if necessary, and then create it
             if (path.existsSync(htmlDirectory)) {
