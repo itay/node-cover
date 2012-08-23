@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/itay/node-cover.png)](http://travis-ci.org/itay/node-cover)
 ## Cover - Native JavaScript Code Coverage
 
 Cover gives you the ability to collect code-coverage for your projects, using
