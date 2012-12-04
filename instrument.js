@@ -117,11 +117,21 @@ Instrumentor.prototype.instrument = function(code) {
     var wrappedCode = header + code + footer;
     
     // Parse the wrapped code
-    var tree = esprima.parse(wrappedCode, {range: true, loc: true});
-    
+    var tree = esprima.parse(wrappedCode, {range: true, loc: true, comment: true});
+
+    var ignoredLines = {};
+    var ignoreRe = /^\s*cover\s*:\s*false\s*$/
+    tree.comments.
+        filter(function(commentNode) {
+            return ignoreRe.test(commentNode.value);
+        }).
+        forEach(function(commentNode) {
+            ignoredLines[commentNode.loc.start.line] = true;
+        });
+
     // We only "instrument" the original part, which is in this sub-statement
-    this.wrap(tree.body[0].expression.callee.body.body);    
-    
+    this.wrap(tree.body[0].expression.callee.body.body, ignoredLines);
+
     // We need to adjust the nodes for everything on the first line,
     // such that their location statements will start at 1 and not at header.length
     for(var nodeKey in this.nodes) {
@@ -227,13 +237,16 @@ Instrumentor.prototype.traverseAndWrap = function(object, visitor, master) {
     return object.noCover ? undefined : returned;
 };
 
-Instrumentor.prototype.wrap = function(tree) {    
+Instrumentor.prototype.wrap = function(tree, ignoredLines) {
     var that = this;
-    this.traverseAndWrap(tree, function(node, path) {           
+    this.traverseAndWrap(tree, function(node, path) {
         if (node.noCover) {
             return;
         }
-        
+        if (node.loc && node.loc.start.line in ignoredLines) {
+            return false;
+        }
+
         parent = path[0];
         switch(node.type) {
             case esprima.Syntax.ExpressionStatement:
