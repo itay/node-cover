@@ -19,15 +19,15 @@
       html, body {
         overflow-x: hidden;
       }
-      
+
       .container {
         width: 99%;
         padding-top: 10px;
       }
-      
+
       .content {
       }
-      
+
       .container > footer p {
         text-align: center; /* center align it with the container */
       }
@@ -42,12 +42,12 @@
         padding-left: 5px;
         padding-right: 5px;
       }
-      
+
       table#files-table td:first-child, table#files-table th:first-child {
         width: 33%;
         overflow-x: hidden;
       }
-      
+
       table#files-table td:first-child:hover {
         overflow-x: visible;
       }
@@ -83,13 +83,13 @@
                 </tr>
               </thead>
               <tbody>
-                <% _.each(data, function(fileData) { %> 
+                <% _.each(data, function(fileData) { %>
                   <tr>
                   <% _.each(fileData, function(cell, index) { %>
-                    <% if (index === 0) { %> 
-                      <td><a href='<%= fileUrls[cell] %>'><%= cell %></a<</td>   
+                    <% if (index === 0) { %>
+                      <td><a href='<%= fileUrls[cell] %>'><%= cell %></a<</td>
                     <% } else { %>
-                      <td><%= cell %></td>   
+                      <td><%= cell %></td>
                     <% } %>
                   <% }); %>
                   </tr>
