@@ -388,6 +388,11 @@ Instrumentor.prototype.wrap = function(tree, ignoredLines) {
                           parent.type == 'DoWhileStatement'))) {
                         return;
                     }
+                    // Do not instrument Identifier when preceded by typeof
+                    if (parent.operator == 'typeof') {
+                        return;
+                    }
+
                 }
                 var newNode = {
                     "type": "SequenceExpression",
