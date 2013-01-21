@@ -19,6 +19,8 @@
     var Table         = require('../contrib/cli-table');
     var pkg           = require('../package.json');
 
+    var exists        = fs.existsSync || path.existsSync;
+
     var patch_console = require('../utils/console');
     var cover         = require("../index.js");
 
@@ -67,7 +69,7 @@
 
         // Get the full path relative to the CWD
         var fullIgnorePath = path.resolve(CWD, ignorePath);
-        if (path.existsSync(fullIgnorePath)) {
+        if (exists(fullIgnorePath)) {
             // If we found an ignore file, read it in
             var ignoreContents = fs.readFileSync(fullIgnorePath, "utf-8");
             try {
@@ -99,7 +101,7 @@
 
         // Get the full path relative to the CWD
         configFile = path.resolve(CWD, configFile);
-        if (!path.existsSync(configFile)) {
+        if (!exists(configFile)) {
             configFile = defaultConfigPath;
         }
 
@@ -174,7 +176,7 @@
 
     // Run a file with coverage enabled
     var runFile = function(file, options, ignore, debug) {
-        if (!path.existsSync(file)) {
+        if (!exists(file)) {
             try {
                 file = which(file);
             }
@@ -247,7 +249,7 @@
 
         // Make the directory
         var dataDirectory = path.join(CWD, configs.dataDirectory);
-        if (!path.existsSync(dataDirectory)) {
+        if (!exists(dataDirectory)) {
             fs.mkdirSync(dataDirectory, "0755");
         }
 
@@ -297,7 +299,7 @@
 
         // Make the directory
         var dataDirectory = path.join(CWD, configs.dataDirectory);
-        if (!path.existsSync(dataDirectory)) {
+        if (!exists(dataDirectory)) {
             fs.mkdirSync(dataDirectory, "0755");
         }
 
@@ -340,7 +342,7 @@
         }
 
         // If it doesn't exist, then error out
-        if (!path.existsSync(filename)) {
+        if (!exists(filename)) {
             console.error("Coverage data file does not exist: " + filename);
             process.exit(1);
         }
@@ -394,7 +396,7 @@
         var datas = [];
         _.each(files, function(filename) {
             // If it doesn't exist, then error out
-            if (!path.existsSync(filename)) {
+            if (!exists(filename)) {
                 console.error("Coverage data file does not exist: " + filename);
                 process.exit(1);
             }
@@ -464,7 +466,7 @@
             allStats.push(statsRow('Overall', coverageData.overall.stats()));
 
             // Delete the HTML directory if necessary, and then create it
-            if (path.existsSync(htmlDirectory)) {
+            if (exists(htmlDirectory)) {
                rmdirRecursiveSync(htmlDirectory);
             }
             fs.mkdirSync(htmlDirectory, "755");
@@ -565,7 +567,7 @@
     var run = function(file, cmdline, config, ignore, debug) {
         if (debug) {
             var debugDirectory = path.join(CWD, config.debugDirectory);
-            if (!path.existsSync(debugDirectory)) {
+            if (!exists(debugDirectory)) {
                 fs.mkdirSync(debugDirectory, "0755");
             }
         }
