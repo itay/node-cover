@@ -352,7 +352,6 @@
         var coverageData = JSON.parse(data);
 
         var overall = {
-          filename: 'Overall',
           missing  : 0,
           seen     : 0,
           total    : 0,
@@ -376,7 +375,10 @@
 
         overall.percentage = overall.seen / overall.total;
         overall.blocks.percentage = overall.blocks.seen / overall.blocks.total;
-        coverageData.overall = {stats: function() { return overall; }};
+        coverageData.overall = {
+          filename: 'Overall',
+          stats: function() { return overall; }
+        };
 
         return coverageData;
     };
