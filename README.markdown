@@ -84,7 +84,7 @@ for Cover itself:
     
 You can specify both files and directories in the `.coverignore` file.
 
-If you have a customer path for your configuration files, you can specify this
+If you have a custom path for your configuration files, you can specify this
 on the command line:
 
 > cover --config path/to/config --ignore path/to/ignore run myfile.js
